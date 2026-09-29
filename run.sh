@@ -35,28 +35,25 @@ echo "[4/7] TPS Benchmark — 200,000 readings..."
 ./bin/tpsbench -url=$API/industrial/reading/batch -key=test-keys/private.pem -sensor=bench-001 -n=200000 -c=50 -bs=500
 echo ""
 
-echo "[5/7] Rate Limiting check (100 parallel requests)..."
-sleep 65
-TMP=$(mktemp -d)
-for i in $(seq 1 100); do
-  (curl -s -o /dev/null -w "%{http_code}\n" $API/health >> $TMP/codes) &
-done
-wait
-OK=$(grep -c "^200" $TMP/codes || echo 0)
-BLOCKED=$(grep -c "^429" $TMP/codes || echo 0)
-echo "      Allowed: $OK | Blocked (429): $BLOCKED"
-rm -rf $TMP
+
+echo "[5/8] Running real attack simulation suite..."
+./attack.sh
 echo ""
 
-echo "[6/7] Dual Control & Session..."
+echo "[6/8] Dual Control & Session..."
 curl -s -X POST $API/dual/request -H "$TOK" -H "Content-Type: application/json" -d '{"data":"test-tx","by":"admin1"}' | head -c 150
 echo ""
 curl -s -X POST $API/signing/session -H "$TOK" | head -c 150
 echo ""
 echo ""
 
-echo "[7/7] Integrity check..."
+echo "[7/8] Integrity check..."
 curl -s $API/industrial/dashboard -H "$TOK" | head -c 250
+echo ""
+echo ""
+
+echo "[8/8] Final Health check..."
+curl -s $API/health
 echo ""
 echo ""
 
