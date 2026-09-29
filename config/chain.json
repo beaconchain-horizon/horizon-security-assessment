@@ -1,0 +1,8 @@
+{
+  "chain_id": "mobarakeh-steel-01",
+  "network_name": "Mobarakeh Steel Private Network",
+  "created_at": "2026-09-12",
+  "description": "Air-gapped private network for Mobarakeh Steel industrial data",
+  "admin_public_key": "0x973821a9d06ecd59056ffab7bd04474fadf6d712",
+  "air_gap_allowed": true
+}

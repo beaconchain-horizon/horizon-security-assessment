@@ -1,0 +1,9 @@
+test-keys/
+*.db
+*.db-shm
+*.db-wal
+switch.log
+*.log
+.DS_Store
+Thumbs.db
+*.bak
