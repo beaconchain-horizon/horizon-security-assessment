@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>Horizon — Offline License Generator</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Tahoma,sans-serif}
+body{background:linear-gradient(135deg,#0a1628,#1a2942);color:#eef2ff;min-height:100vh;padding:30px}
+.cont{max-width:700px;margin:0 auto;background:rgba(20,32,55,.9);border:1px solid rgba(79,158,255,.3);border-radius:20px;padding:30px}
+h1{color:#4f9eff;text-align:center;margin-bottom:10px;font-size:1.8rem}
+.sub{text-align:center;color:#8fa2dc;font-size:.85rem;margin-bottom:25px}
+.sec{background:rgba(30,45,70,.5);border-radius:12px;padding:18px;margin:15px 0;border-right:3px solid #4f9eff}
+.sec h2{color:#c084fc;font-size:1rem;margin-bottom:12px}
+label{display:block;margin:10px 0 5px;color:#cbd5e1;font-size:.8rem}
+input,select,textarea{width:100%;padding:10px;border-radius:8px;border:1px solid rgba(79,158,255,.3);background:rgba(10,22,40,.8);color:#fff;font-family:inherit;font-size:.85rem}
+input:focus,select:focus,textarea:focus{outline:none;border-color:#4f9eff}
+.btn{width:100%;padding:14px;margin-top:12px;border:none;border-radius:10px;background:linear-gradient(135deg,#4f9eff,#c084fc);color:#fff;font-weight:700;cursor:pointer;font-family:inherit;font-size:.95rem;transition:.2s}
+.btn:hover{opacity:.9;transform:translateY(-2px)}
+.btn.green{background:linear-gradient(135deg,#4ade80,#22c55e);color:#000}
+.btn.gray{background:rgba(30,45,70,.8);border:1px solid rgba(79,158,255,.3)}
+.status{padding:12px;border-radius:8px;margin:10px 0;font-size:.85rem;text-align:center;display:none}
+.status.ok{background:rgba(74,222,128,.15);border:1px solid #4ade80;color:#4ade80}
+.status.err{background:rgba(239,68,68,.15);border:1px solid #ef4444;color:#ef4444}
+.status.info{background:rgba(79,158,255,.15);border:1px solid #4f9eff;color:#4f9eff}
+.key-info{background:rgba(10,22,40,.6);padding:10px;border-radius:8px;margin-top:10px;font-family:monospace;font-size:.7rem;color:#8fa2dc;word-break:break-all;direction:ltr;text-align:left}
+.file-label{display:block;padding:20px;border:2px dashed rgba(79,158,255,.4);border-radius:10px;text-align:center;cursor:pointer;color:#4f9eff;transition:.2s}
+.file-label:hover{background:rgba(79,158,255,.1);border-color:#4f9eff}
+.file-label input{display:none}
+.badge{display:inline-block;background:linear-gradient(135deg,#4f9eff,#c084fc);color:#fff;padding:3px 10px;border-radius:20px;font-size:.7rem;font-weight:700;margin-right:5px}
+</style>
+</head>
+<body>
+<div class="cont">
+<h1>🔷 Offline License Generator</h1>
+<p class="sub">Horizon Core — کاملاً آفلاین · بدون نیاز به سرور</p>
+
+<div class="sec">
+<h2><span class="badge">۱</span> لود کلید خصوصی از USB</h2>
+<label class="file-label" for="keyFile">
+📁 کلیک کن یا فایل کلید را از USB انتخاب کن
+<input type="file" id="keyFile" accept=".pem,.key,.txt,.hex,.json">
+</label>
+<div id="keyStatus" class="status"></div>
+<div id="keyInfo" class="key-info" style="display:none"></div>
+</div>
+
+<div class="sec">
+<h2><span class="badge">۲</span> اطلاعات لایسنس</h2>
+<label>شناسه لایسنس (License ID)</label>
+<input type="text" id="licId" value="HORIZON-GOLD-001">
+
+<label>سازمان هدف (نمونه)</label>
+<select id="userId">
+<option value="bank-markazi">نمونه سازمان A — بانکداری</option>
+<option value="bank-melli">نمونه سازمان B — بانکداری</option>
+<option value="bank-saderat">نمونه سازمان C — بانکداری</option>
+<option value="bank-mellat">نمونه سازمان D — بانکداری</option>
+<option value="bank-sepeh">نمونه سازمان E — بانکداری</option>
+<option value="nioc">نمونه صنعتی F — نفت</option>
+<option value="nigc">نمونه صنعتی G — گاز</option>
+<option value="tavanir">نمونه صنعتی H — برق</option>
+<option value="msc">نمونه صنعتی I — فولاد</option>
+<option value="nicico">نمونه صنعتی J — مس</option>
+<option value="custom">دستی وارد کن...</option>
+</select>
+<input type="text" id="customUser" placeholder="نام سازمان (دستی)" style="display:none;margin-top:8px">
+
+<label>شناسه محصول</label>
+<input type="text" id="productId" value="horizon-core">
+
+<label>حجم (تعداد تراکنش مجاز)</label>
+<select id="volume">
+<option value="1000000">۱ میلیون — برنزی</option>
+<option value="10000000">۱۰ میلیون — نقره‌ای</option>
+<option value="50000000" selected>۵۰ میلیون — طلایی</option>
+<option value="500000000">۵۰۰ میلیون — سازمانی</option>
+<option value="custom">دستی وارد کن...</option>
+</select>
+<input type="number" id="customVolume" placeholder="تعداد دلخواه" style="display:none;margin-top:8px">
+
+<label>مدت (روز)</label>
+<input type="number" id="duration" value="365" min="1" max="3650">
+
+<label>Hardware ID (اختیاری)</label>
+<input type="text" id="hwid" placeholder="اگر خالی باشد، لایسنس آزاد است">
+
+<button class="btn green" id="genBtn" disabled>🔐 تولید لایسنس آفلاین با ECDSA</button>
+<div id="genStatus" class="status"></div>
+</div>
+
+<div class="sec">
+<h2><span class="badge">۳</span> نتیجه</h2>
+<button class="btn gray" id="dlBtn" disabled>💾 دانلود فایل لایسنس (.lic)</button>
+<pre id="result" class="key-info" style="display:none;max-height:300px;overflow:auto"></pre>
+</div>
+
+<div style="text-align:center;color:#475569;font-size:.75rem;margin-top:20px">
+Horizon Core © ۲۰۲۶ · Offline License Engine v1.1
+</div>
+</div>
+
+<script>
+var $ = function(id){ return document.getElementById(id); };
+var privateKey = null;
+var publicKeyHex = '';
+
+function showStatus(id, type, msg) {
+  var el = $(id);
+  el.className = 'status ' + type;
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+
+// ═══════════════════════════════════════════════
+// File picker
+// ═══════════════════════════════════════════════
+$('keyFile').addEventListener('change', async function(e) {
+  var file = e.target.files[0];
+  if (!file) return;
+  try {
+    var text = await file.text();
+    await loadKey(text, file.name);
+  } catch(err) {
+    showStatus('keyStatus', 'err', '❌ خطا: ' + err.message);
+  }
+});
+
+// ═══════════════════════════════════════════════
+// Load key (flexible format)
+// ═══════════════════════════════════════════════
+async function loadKey(content, filename) {
+  showStatus('keyStatus', 'info', '⏳ در حال پردازش کلید...');
+  content = content.trim();
+
+  // Try JSON
+  if (content.charAt(0) === '{') {
+    try {
+      var j = JSON.parse(content);
+      content = (j.private_key || j.key || j.privateKey || '').trim();
+    } catch(e) {}
+  }
+
+  // Strip quotes
+  content = content.replace(/^["']+|["']+$/g, '').trim();
+
+  var rawKey;
+  var format = '';
+
+  if (content.indexOf('-----BEGIN') !== -1) {
+    // PEM
+    format = 'PEM';
+    var b64 = content.replace(/-----[^-]+-----/g, '').replace(/\s/g, '');
+    var der = Uint8Array.from(atob(b64), function(c){ return c.charCodeAt(0); });
+    rawKey = der;
+  } else {
+    // Hex
+    var hex = content.replace(/^0x/i, '').replace(/[^0-9a-fA-F]/g, '');
+    if (hex.length === 64) {
+      format = 'HEX-32';
+      rawKey = new Uint8Array(32);
+      for (var i = 0; i < 32; i++) {
+        rawKey[i] = parseInt(hex.substr(i*2, 2), 16);
+      }
+    } else if (hex.length >= 100 && hex.length <= 140) {
+      format = 'HEX-FULL';
+      rawKey = new Uint8Array(hex.length / 2);
+      for (var j = 0; j < rawKey.length; j++) {
+        rawKey[j] = parseInt(hex.substr(j*2, 2), 16);
+      }
+    } else {
+      throw new Error('طول hex = ' + hex.length + ' کاراکتر. باید ۶۴ (کلید خصوصی) یا ۱۳۰ (کلید عمومی) باشه.');
+    }
+  }
+
+  try {
+    var pkcs8Prefix = new Uint8Array([
+      0x30, 0x41, 0x02, 0x01, 0x00, 0x30, 0x13, 0x06, 0x07,
+      0x2a, 0x86, 0x48, 0xce, 0x3d, 0x02, 0x01, 0x06, 0x08,
+      0x2a, 0x86, 0x48, 0xce, 0x3d, 0x03, 0x01, 0x07, 0x04,
+      0x27, 0x30, 0x25, 0x02, 0x01, 0x01, 0x04, 0x20
+    ]);
+    var pkcs8 = new Uint8Array(pkcs8Prefix.length + 32);
+    pkcs8.set(pkcs8Prefix, 0);
+    pkcs8.set(rawKey.slice(0, 32), pkcs8Prefix.length);
+
+    privateKey = await crypto.subtle.importKey(
+      'pkcs8', pkcs8,
+      { name: 'ECDSA', namedCurve: 'P-256' },
+      true, ['sign']
+    );
+
+    // Export public key
+    var jwk = await crypto.subtle.exportKey('jwk', privateKey);
+    function b64ToBytes(s) {
+      return Uint8Array.from(atob(s.replace(/-/g,'+').replace(/_/g,'/')), function(c){ return c.charCodeAt(0); });
+    }
+    var xb = b64ToBytes(jwk.x);
+    var yb = b64ToBytes(jwk.y);
+    var pub = new Uint8Array(1 + xb.length + yb.length);
+    pub[0] = 0x04;
+    pub.set(xb, 1);
+    pub.set(yb, 1 + xb.length);
+    publicKeyHex = '0x' + Array.from(pub).map(function(b){ return b.toString(16).padStart(2,'0'); }).join('');
+
+    $('keyInfo').style.display = 'block';
+    $('keyInfo').textContent =
+      '📄 File: ' + filename + '\n' +
+      '🔑 Format: ' + format + '\n' +
+      '📍 Public Key: ' + publicKeyHex;
+
+    showStatus('keyStatus', 'ok', '✅ کلید بارگذاری شد (' + format + ')');
+    $('genBtn').disabled = false;
+  } catch(err) {
+    showStatus('keyStatus', 'err', '❌ خطا در پردازش کلید: ' + (err.message || err.name || err.toString()));
+  }
+}
+
+// ═══════════════════════════════════════════════
+// Dropdown handlers
+// ═══════════════════════════════════════════════
+$('userId').addEventListener('change', function(e) {
+  $('customUser').style.display = e.target.value === 'custom' ? 'block' : 'none';
+});
+$('volume').addEventListener('change', function(e) {
+  $('customVolume').style.display = e.target.value === 'custom' ? 'block' : 'none';
+});
+
+// ═══════════════════════════════════════════════
+// Generate license
+// ═══════════════════════════════════════════════
+$('genBtn').addEventListener('click', async function() {
+  if (!privateKey) {
+    showStatus('genStatus', 'err', '❌ اول کلید را بارگذاری کن');
+    return;
+  }
+  try {
+    showStatus('genStatus', 'info', '⏳ در حال امضا...');
+
+    var licId = $('licId').value.trim();
+    var userId = $('userId').value === 'custom' ? $('customUser').value.trim() : $('userId').value;
+    var productId = $('productId').value.trim();
+    var volume = $('volume').value === 'custom' ? parseInt($('customVolume').value) : parseInt($('volume').value);
+    var duration = parseInt($('duration').value);
+    var hwid = $('hwid').value.trim();
+
+    if (!licId || !userId || !productId || !volume || !duration) {
+      throw new Error('همه فیلدها را پر کن');
+    }
+
+    var issuedAt = Math.floor(Date.now() / 1000);
+    var expiresAt = issuedAt + (duration * 86400);
+    var merkleRoot = '';
+    var status = 'active';
+
+    var expDate = new Date(expiresAt * 1000).toISOString().replace(/\.\d{3}Z$/, 'Z');
+    var msg = licId + '|' + productId + '|' + userId + '|' + volume + '|' + merkleRoot + '|' + status + '|' + expDate;
+
+    var msgBytes = new TextEncoder().encode(msg);
+    var sig = await crypto.subtle.sign(
+      { name: 'ECDSA', hash: 'SHA-256' },
+      privateKey,
+      msgBytes
+    );
+    var sigHex = Array.from(new Uint8Array(sig)).map(function(b){ return b.toString(16).padStart(2,'0'); }).join('');
+
+    var license = {
+      id: 0,
+      license_id: licId,
+      user_id: userId,
+      product_id: productId,
+      volume: volume,
+      used: 0,
+      duration: duration,
+      signature: sigHex,
+      merkle_root: merkleRoot,
+      issued_at: issuedAt,
+      expires_at: expiresAt,
+      status: status,
+      hardware_id: hwid
+    };
+
+    $('result').style.display = 'block';
+    $('result').textContent = JSON.stringify(license, null, 2);
+    $('dlBtn').disabled = false;
+    showStatus('genStatus', 'ok', '✅ لایسنس با موفقیت تولید شد');
+  } catch(err) {
+    showStatus('genStatus', 'err', '❌ خطا: ' + (err.message || err.name || err.toString()));
+  }
+});
+
+// ═══════════════════════════════════════════════
+// Download
+// ═══════════════════════════════════════════════
+$('dlBtn').addEventListener('click', function() {
+  var content = $('result').textContent;
+  if (!content) return;
+  var licId = $('licId').value.trim();
+  var blob = new Blob([content], { type: 'application/json' });
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url;
+  a.download = licId + '.lic';
+  a.click();
+  URL.revokeObjectURL(url);
+  showStatus('genStatus', 'ok', '💾 فایل دانلود شد: ' + licId + '.lic');
+});
+</script>
+</body>
+</html>

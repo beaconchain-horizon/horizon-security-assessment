@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Horizon — بلاکچین اختصاصی</title>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --blue:#0069ff;--blue-dark:#0052cc;--blue-light:#e6f0ff;
+  --navy:#001b3d;--navy-2:#001129;
+  --gray-50:#f8f9fb;--gray-100:#eef1f6;--gray-200:#e1e6ed;
+  --gray-400:#8896a8;--gray-600:#5b6b7f;--gray-900:#0d1a2b;
+  --white:#fff;
+  --green:#00a86b;--purple:#7c3aed;
+}
+body{
+  font-family:'Vazirmatn',system-ui,sans-serif;
+  background:var(--white);color:var(--gray-900);
+  line-height:1.7;-webkit-font-smoothing:antialiased;
+}
+
+/* ============ NAV ============ */
+.nav{
+  position:sticky;top:0;z-index:100;background:var(--navy);
+  padding:0 40px;height:64px;display:flex;align-items:center;justify-content:space-between;
+  border-bottom:1px solid rgba(255,255,255,0.08);
+}
+.nav-logo{
+  color:#fff;font-size:20px;font-weight:800;letter-spacing:-0.5px;
+  display:flex;align-items:center;gap:8px;
+}
+.nav-logo .mark{
+  width:28px;height:28px;border-radius:6px;
+  background:linear-gradient(135deg,#0069ff,#7c3aed);
+  display:flex;align-items:center;justify-content:center;
+  font-size:16px;color:#fff;
+}
+.nav-links{display:flex;gap:32px;align-items:center}
+.nav-links a{
+  color:rgba(255,255,255,0.75);text-decoration:none;
+  font-size:14px;font-weight:500;transition:.2s;
+}
+.nav-links a:hover{color:#fff}
+.nav-actions{display:flex;gap:12px;align-items:center}
+.nav-login{
+  color:#fff;background:transparent;border:none;
+  font-family:inherit;font-size:14px;font-weight:500;cursor:pointer;
+  padding:8px 16px;
+}
+.nav-signup{
+  background:var(--blue);color:#fff;border:none;
+  padding:9px 20px;border-radius:6px;font-family:inherit;
+  font-size:14px;font-weight:600;cursor:pointer;transition:.2s;
+}
+.nav-signup:hover{background:var(--blue-dark)}
+
+/* ============ HERO ============ */
+.hero{
+  background:linear-gradient(180deg,var(--navy) 0%,var(--navy-2) 100%);
+  color:#fff;padding:100px 40px 120px;position:relative;overflow:hidden;
+}
+.hero::before{
+  content:'';position:absolute;top:-200px;right:-200px;
+  width:600px;height:600px;border-radius:50%;
+  background:radial-gradient(circle,rgba(0,105,255,0.3),transparent 70%);
+  filter:blur(60px);
+}
+.hero::after{
+  content:'';position:absolute;bottom:-300px;left:-100px;
+  width:700px;height:700px;border-radius:50%;
+  background:radial-gradient(circle,rgba(124,58,237,0.25),transparent 70%);
+  filter:blur(80px);
+}
+.hero-inner{
+  max-width:1200px;margin:0 auto;position:relative;z-index:2;
+  display:grid;grid-template-columns:1.1fr 1fr;gap:80px;align-items:center;
+}
+.hero h1{
+  font-size:56px;font-weight:800;line-height:1.15;
+  letter-spacing:-1.5px;margin-bottom:24px;
+}
+.hero h1 span{
+  background:linear-gradient(135deg,#4d94ff,#a78bfa);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+.hero p{
+  font-size:19px;color:rgba(255,255,255,0.7);
+  margin-bottom:36px;line-height:1.7;max-width:540px;
+}
+.hero-btns{display:flex;gap:14px;flex-wrap:wrap}
+.btn-primary{
+  background:var(--blue);color:#fff;border:none;
+  padding:14px 28px;border-radius:8px;font-family:inherit;
+  font-size:15px;font-weight:600;cursor:pointer;transition:.2s;
+}
+.btn-primary:hover{background:var(--blue-dark);transform:translateY(-1px)}
+.btn-ghost{
+  background:rgba(255,255,255,0.08);color:#fff;
+  border:1px solid rgba(255,255,255,0.2);
+  padding:14px 28px;border-radius:8px;font-family:inherit;
+  font-size:15px;font-weight:600;cursor:pointer;transition:.2s;
+}
+.btn-ghost:hover{background:rgba(255,255,255,0.14)}
+
+/* Terminal mockup */
+.term{
+  background:#0a1628;border-radius:12px;padding:20px;
+  border:1px solid rgba(255,255,255,0.1);
+  font-family:'Menlo','Consolas',monospace;font-size:13px;
+  box-shadow:0 30px 80px rgba(0,0,0,0.5);
+}
+.term-bar{display:flex;gap:6px;margin-bottom:16px}
+.term-dot{width:11px;height:11px;border-radius:50%}
+.term-dot.r{background:#ff5f57}.term-dot.y{background:#febc2e}.term-dot.g{background:#28c840}
+.term-line{color:#8896a8;line-height:1.9}
+.term-line .cmd{color:#4d94ff}
+.term-line .ok{color:#00a86b}
+.term-line .val{color:#a78bfa}
+.term-line .dim{color:#5b6b7f}
+
+/* ============ STATS BAR ============ */
+.stats-bar{
+  background:var(--gray-50);border-bottom:1px solid var(--gray-200);
+  padding:32px 40px;
+}
+.stats-inner{
+  max-width:1200px;margin:0 auto;
+  display:grid;grid-template-columns:repeat(4,1fr);gap:40px;
+}
+.stat-cell{text-align:center;border-right:1px solid var(--gray-200)}
+.stat-cell:last-child{border-right:none}
+.stat-val{
+  font-size:32px;font-weight:800;color:var(--gray-900);
+  font-family:'Menlo',monospace;letter-spacing:-1px;
+}
+.stat-lbl{font-size:13px;color:var(--gray-600);margin-top:6px}
+
+/* ============ SECTION ============ */
+.section{padding:100px 40px}
+.section-inner{max-width:1200px;margin:0 auto}
+.section-head{text-align:center;margin-bottom:60px}
+.section-head h2{
+  font-size:40px;font-weight:800;letter-spacing:-1px;
+  margin-bottom:16px;color:var(--gray-900);
+}
+.section-head p{
+  font-size:18px;color:var(--gray-600);
+  max-width:640px;margin:0 auto;
+}
+.eyebrow{
+  display:inline-block;font-size:13px;font-weight:600;
+  color:var(--blue);text-transform:uppercase;letter-spacing:1.5px;
+  margin-bottom:12px;
+}
+
+/* ============ FEATURES ============ */
+.feat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.feat-card{
+  padding:32px;border-radius:12px;background:var(--white);
+  border:1px solid var(--gray-200);transition:.2s;
+}
+.feat-card:hover{
+  border-color:var(--blue);
+  box-shadow:0 12px 40px rgba(0,105,255,0.08);
+  transform:translateY(-2px);
+}
+.feat-icon{
+  width:48px;height:48px;border-radius:10px;
+  background:var(--blue-light);color:var(--blue);
+  display:flex;align-items:center;justify-content:center;
+  font-size:22px;margin-bottom:20px;
+}
+.feat-card h3{font-size:18px;font-weight:700;margin-bottom:10px;color:var(--gray-900)}
+.feat-card p{color:var(--gray-600);font-size:15px;line-height:1.7}
+
+/* ============ PRODUCTS ============ */
+.products-section{background:var(--gray-50)}
+.prod-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
+.prod-card{
+  padding:32px 28px;border-radius:12px;background:var(--white);
+  border:1px solid var(--gray-200);position:relative;
+  transition:.2s;display:flex;flex-direction:column;
+}
+.prod-card:hover{
+  border-color:var(--blue);
+  box-shadow:0 20px 50px rgba(0,105,255,0.12);
+  transform:translateY(-4px);
+}
+.prod-card.pop{
+  border-color:var(--blue);border-width:2px;
+  box-shadow:0 20px 50px rgba(0,105,255,0.15);
+}
+.pop-badge{
+  position:absolute;top:-12px;right:24px;
+  background:var(--blue);color:#fff;
+  padding:5px 14px;border-radius:20px;
+  font-size:12px;font-weight:700;
+}
+.prod-tier{
+  font-size:12px;font-weight:700;color:var(--gray-400);
+  letter-spacing:2px;margin-bottom:8px;
+}
+.prod-name{
+  font-size:22px;font-weight:800;color:var(--gray-900);
+  margin-bottom:20px;letter-spacing:-0.5px;
+}
+.prod-price{
+  font-size:38px;font-weight:800;color:var(--gray-900);
+  font-family:'Menlo',monospace;letter-spacing:-2px;line-height:1;
+}
+.prod-price .cur{font-size:16px;color:var(--gray-600);font-weight:500;font-family:'Vazirmatn',sans-serif}
+.prod-unit{font-size:13px;color:var(--gray-600);margin-top:8px;margin-bottom:24px}
+.prod-list{list-style:none;padding:24px 0;border-top:1px solid var(--gray-200);flex:1}
+.prod-list li{
+  padding:8px 0;font-size:14px;color:var(--gray-600);
+  display:flex;align-items:flex-start;gap:10px;
+}
+.prod-list li::before{
+  content:'✓';color:var(--green);font-weight:800;
+  font-size:14px;line-height:1.4;
+}
+.prod-btn{
+  width:100%;padding:12px;border-radius:8px;
+  background:var(--blue);color:#fff;border:none;
+  font-family:inherit;font-size:14px;font-weight:600;
+  cursor:pointer;transition:.2s;margin-top:16px;
+}
+.prod-btn:hover{background:var(--blue-dark)}
+.prod-card.pop .prod-btn{background:var(--blue)}
+.prod-card:not(.pop) .prod-btn{
+  background:var(--white);color:var(--blue);
+  border:1.5px solid var(--blue);
+}
+.prod-card:not(.pop) .prod-btn:hover{background:var(--blue-light)}
+
+/* ============ CALCULATOR ============ */
+.calc-section{background:var(--navy);color:#fff;padding:80px 40px}
+.calc-inner{
+  max-width:1000px;margin:0 auto;
+  display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;
+}
+.calc-text h2{
+  font-size:36px;font-weight:800;letter-spacing:-1px;
+  margin-bottom:16px;line-height:1.2;
+}
+.calc-text p{color:rgba(255,255,255,0.7);font-size:16px;line-height:1.7}
+.calc-box{
+  background:#0a1628;border:1px solid rgba(255,255,255,0.1);
+  border-radius:16px;padding:32px;
+  box-shadow:0 30px 80px rgba(0,0,0,0.4);
+}
+.calc-row{margin-bottom:20px}
+.calc-row label{
+  display:block;font-size:13px;font-weight:600;
+  color:rgba(255,255,255,0.6);margin-bottom:8px;
+}
+.calc-row select,.calc-row input{
+  width:100%;padding:12px 16px;
+  background:#050d1c;border:1px solid rgba(255,255,255,0.15);
+  border-radius:8px;color:#fff;font-family:inherit;
+  font-size:15px;outline:none;transition:.2s;
+}
+.calc-row select:focus,.calc-row input:focus{border-color:var(--blue)}
+.calc-row option{background:#0a1628;color:#fff}
+.calc-result{
+  margin-top:24px;padding:20px;
+  background:rgba(0,105,255,0.1);
+  border:1px solid rgba(0,105,255,0.3);
+  border-radius:10px;
+}
+.calc-result-label{font-size:12px;color:rgba(255,255,255,0.6);margin-bottom:6px}
+.calc-result-val{
+  font-size:32px;font-weight:800;color:#fff;
+  font-family:'Menlo',monospace;letter-spacing:-1.5px;
+}
+.calc-result-val .cur{font-size:16px;color:rgba(255,255,255,0.6);font-family:'Vazirmatn',sans-serif;font-weight:500}
+.calc-detail{
+  font-size:12px;color:rgba(255,255,255,0.5);
+  margin-top:10px;padding-top:10px;
+  border-top:1px solid rgba(255,255,255,0.1);
+  line-height:1.8;
+}
+
+/* ============ BLOCKS ============ */
+.blocks-section{background:var(--white)}
+.blocks-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.block-card{
+  padding:24px;border-radius:12px;
+  border:1px solid var(--gray-200);background:var(--white);
+  transition:.2s;cursor:pointer;
+}
+.block-card:hover{
+  border-color:var(--blue);
+  box-shadow:0 8px 30px rgba(0,105,255,0.1);
+}
+.block-card.genesis{border-color:var(--blue);background:var(--blue-light)}
+.block-idx{
+  font-size:26px;font-weight:800;font-family:'Menlo',monospace;
+  color:var(--blue);margin-bottom:6px;letter-spacing:-1px;
+}
+.block-tag{
+  display:inline-block;font-size:11px;font-weight:700;
+  color:var(--blue);background:var(--blue-light);
+  padding:2px 10px;border-radius:12px;margin-bottom:10px;
+}
+.block-hash{
+  font-size:11px;color:var(--gray-400);
+  font-family:'Menlo',monospace;word-break:break-all;
+  margin-bottom:12px;line-height:1.5;
+}
+.block-meta{
+  display:flex;justify-content:space-between;
+  font-size:12px;color:var(--gray-600);
+  padding-top:12px;border-top:1px solid var(--gray-200);
+}
+
+/* ============ CLIENTS ============ */
+.clients-section{background:var(--gray-50)}
+.clients-grid{
+  display:grid;grid-template-columns:repeat(6,1fr);gap:16px;
+}
+.client-card{
+  padding:24px 12px;border-radius:10px;
+  background:var(--white);border:1px solid var(--gray-200);
+  text-align:center;transition:.2s;
+}
+.client-card:hover{border-color:var(--blue);transform:translateY(-2px)}
+.client-icon{font-size:28px;margin-bottom:10px}
+.client-name{font-size:13px;font-weight:600;color:var(--gray-900)}
+.client-type{font-size:11px;color:var(--gray-400);margin-top:2px}
+
+/* ============ CTA ============ */
+.cta{
+  padding:100px 40px;text-align:center;
+  background:linear-gradient(135deg,var(--blue),var(--purple));
+  color:#fff;
+}
+.cta h2{font-size:42px;font-weight:800;letter-spacing:-1px;margin-bottom:16px}
+.cta p{font-size:18px;color:rgba(255,255,255,0.9);margin-bottom:32px;max-width:600px;margin-left:auto;margin-right:auto}
+.cta-btn{
+  background:#fff;color:var(--blue);border:none;
+  padding:16px 36px;border-radius:8px;font-family:inherit;
+  font-size:16px;font-weight:700;cursor:pointer;transition:.2s;
+}
+.cta-btn:hover{transform:translateY(-2px);box-shadow:0 12px 30px rgba(0,0,0,0.2)}
+
+/* ============ FOOTER ============ */
+footer{
+  background:var(--navy);color:rgba(255,255,255,0.6);
+  padding:60px 40px 32px;text-align:center;
+  font-size:13px;
+}
+footer .logo{
+  color:#fff;font-size:20px;font-weight:800;
+  margin-bottom:16px;letter-spacing:-0.5px;
+}
+footer .logo .mark{
+  display:inline-flex;width:24px;height:24px;
+  background:linear-gradient(135deg,#0069ff,#7c3aed);
+  border-radius:5px;align-items:center;justify-content:center;
+  margin-left:8px;font-size:13px;
+}
+
+@media(max-width:1100px){
+  .hero-inner,.calc-inner{grid-template-columns:1fr;gap:40px}
+  .feat-grid,.prod-grid,.blocks-grid{grid-template-columns:1fr 1fr}
+  .clients-grid{grid-template-columns:repeat(3,1fr)}
+  .stats-inner{grid-template-columns:repeat(2,1fr)}
+  .stat-cell:nth-child(2){border-right:none}
+}
+@media(max-width:700px){
+  .nav{padding:0 20px}
+  .nav-links{display:none}
+  .hero{padding:60px 20px}
+  .hero h1{font-size:36px}
+  .section{padding:60px 20px}
+  .section-head h2{font-size:28px}
+  .feat-grid,.prod-grid,.blocks-grid,.clients-grid,.stats-inner{grid-template-columns:1fr}
+  .stat-cell{border-right:none;border-bottom:1px solid var(--gray-200);padding-bottom:20px}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-logo">
+    <span class="mark">◆</span>
+    Horizon
+  </div>
+  <div class="nav-links">
+    <a href="#features">ویژگی‌ها</a>
+    <a href="#products">پلن‌ها</a>
+    <a href="#calc">ماشین‌حساب</a>
+    <a href="#network">شبکه</a>
+    <a href="#clients">مشتریان</a>
+  </div>
+  <div class="nav-actions">
+    <button class="nav-login">ورود</button>
+    <button class="nav-signup">شروع کنید</button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-inner">
+    <div>
+      <h1>
+        زیرساخت بلاکچین<br>
+        برای <span>صنایع حیاتی</span>
+      </h1>
+      <p>
+        پلتفرم لایسنس‌دهی امن با امضای ECDSA و Merkle Proof.
+        آفلاین-اول، مقاوم در برابر قطعی اینترنت، مناسب بانک‌ها و صنایع.
+      </p>
+      <div class="hero-btns">
+        <button class="btn-primary">شروع رایگان</button>
+        <button class="btn-ghost">مشاهده دمو</button>
+      </div>
+    </div>
+    <div class="term">
+      <div class="term-bar">
+        <div class="term-dot r"></div>
+        <div class="term-dot y"></div>
+        <div class="term-dot g"></div>
+      </div>
+      <div class="term-line"><span class="dim">$</span> <span class="cmd">horizon</span> license issue --customer bank-melli</div>
+      <div class="term-line"><span class="ok">✓</span> key unlocked from USB</div>
+      <div class="term-line"><span class="ok">✓</span> ECDSA signed <span class="val">2dd01e28...c53</span></div>
+      <div class="term-line"><span class="ok">✓</span> block <span class="val">#26</span> mined</div>
+      <div class="term-line"><span class="ok">✓</span> merkle root <span class="val">0x789abc...</span></div>
+      <div class="term-line" style="margin-top:12px"><span class="dim">→</span> license saved: <span class="val">HZ-2026-001.lic</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<section class="stats-bar">
+  <div class="stats-inner">
+    <div class="stat-cell">
+      <div class="stat-val">35,938</div>
+      <div class="stat-lbl">حداکثر TPS</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-val">0</div>
+      <div class="stat-lbl">خطا در بنچمارک</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-val">&lt;1ms</div>
+      <div class="stat-lbl">امضای ECDSA</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-val">99.98%</div>
+      <div class="stat-lbl">آپ‌تایم</div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="section" id="features">
+  <div class="section-inner">
+    <div class="section-head">
+      <div class="eyebrow">ویژگی‌ها</div>
+      <h2>ساخته‌شده برای سخت‌ترین شرایط</h2>
+      <p>زیرساختی که برای محیط‌های حیاتی طراحی شده — از بانکداری تا صنایع سنگین.</p>
+    </div>
+    <div class="feat-grid">
+      <div class="feat-card">
+        <div class="feat-icon">🔐</div>
+        <h3>امضای ECDSA P-256</h3>
+        <p>هر تراکنش با امضای رمزنگاری‌شده ثبت می‌شود. کلید خصوصی هرگز از USB خارج نمی‌شود.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">🌳</div>
+        <h3>Merkle Tree Proof</h3>
+        <p>اثبات‌پذیری هر تراکنش با درخت مرکل. غیرقابل دستکاری، قابل تأیید مستقل.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">📡</div>
+        <h3>آفلاین-اول</h3>
+        <p>کار کامل در حالت قطع اینترنت. سینک خودکار هنگام بازگشت اتصال.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">🛡️</div>
+        <h3>Air-Gap Ready</h3>
+        <p>قابل استقرار در محیط‌های کاملاً ایزوله. مناسب زیرساخت‌های حیاتی.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">⚡</div>
+        <h3>عملکرد اثبات‌شده</h3>
+        <p>بیش از ۳۱٬۰۰۰ TPS با صفر خطا در بنچمارک عمومی و قابل تأیید مستقل.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">🏢</div>
+        <h3>Multi-Tenant</h3>
+        <p>معماری چند-مستأجری برای بانک‌ها، صنایع و سازمان‌های بزرگ.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRODUCTS -->
+<section class="section products-section" id="products">
+  <div class="section-inner">
+    <div class="section-head">
+      <div class="eyebrow">پلن‌ها</div>
+      <h2>قیمت‌گذاری شفاف</h2>
+      <p>پرداخت بر اساس حجم تراکنش. بدون هزینه پنهان، بدون غافلگیری.</p>
+    </div>
+    <div class="prod-grid">
+
+      <div class="prod-card">
+        <div class="prod-tier">STANDARD</div>
+        <div class="prod-name">پایه</div>
+        <div class="prod-price">۵۰ <span class="cur">تومان</span></div>
+        <div class="prod-unit">به ازای هر تراکنش</div>
+        <ul class="prod-list">
+          <li>تا ۵۰ میلیون تراکنش</li>
+          <li>اشتراک پایه ۵۰M تومان</li>
+          <li>۳۶۵ روز اعتبار</li>
+          <li>پشتیبانی استاندارد</li>
+        </ul>
+        <button class="prod-btn">خرید لایسنس</button>
+      </div>
+
+      <div class="prod-card">
+        <div class="prod-tier">PROFESSIONAL</div>
+        <div class="prod-name">حرفه‌ای</div>
+        <div class="prod-price">۴۰ <span class="cur">تومان</span></div>
+        <div class="prod-unit">به ازای هر تراکنش</div>
+        <ul class="prod-list">
+          <li>تا ۱۰۰ میلیون تراکنش</li>
+          <li>اشتراک پایه ۱۰۰M تومان</li>
+          <li>۳۶۵ روز اعتبار</li>
+          <li>پشتیبانی اولویت‌دار</li>
+        </ul>
+        <button class="prod-btn">خرید لایسنس</button>
+      </div>
+
+      <div class="prod-card pop">
+        <div class="pop-badge">پرفروش</div>
+        <div class="prod-tier">ENTERPRISE</div>
+        <div class="prod-name">سازمانی</div>
+        <div class="prod-price">۳۰ <span class="cur">تومان</span></div>
+        <div class="prod-unit">به ازای هر تراکنش</div>
+        <ul class="prod-list">
+          <li>تا ۲۰۰ میلیون تراکنش</li>
+          <li>اشتراک پایه ۲۰۰M تومان</li>
+          <li>۳۶۵ روز اعتبار</li>
+          <li>پشتیبانی ۲۴/۷</li>
+          <li>Air-Gap Mode</li>
+        </ul>
+        <button class="prod-btn">خرید لایسنس</button>
+      </div>
+
+      <div class="prod-card">
+        <div class="prod-tier">SOVEREIGN</div>
+        <div class="prod-name">حاکمیتی</div>
+        <div class="prod-price">۲۰ <span class="cur">تومان</span></div>
+        <div class="prod-unit">به ازای هر تراکنش</div>
+        <ul class="prod-list">
+          <li>بدون محدودیت حجم</li>
+          <li>اشتراک پایه ۵۰۰M تومان</li>
+          <li>اعتبار سفارشی</li>
+          <li>تیم اختصاصی</li>
+          <li>استقرار On-Premise</li>
+        </ul>
+        <button class="prod-btn">تماس با ما</button>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- CALCULATOR -->
+<section class="calc-section" id="calc">
+  <div class="calc-inner">
+    <div class="calc-text">
+      <h2>هزینه لایسنس خود را محاسبه کنید</h2>
+      <p>
+        حجم و مدت مورد نیاز خود را انتخاب کنید. قیمت به‌صورت لحظه‌ای محاسبه می‌شود.
+        بدون نیاز به ثبت‌نام.
+      </p>
+    </div>
+    <div class="calc-box">
+      <div class="calc-row">
+        <label>سطح لایسنس</label>
+        <select id="tier">
+          <option value="standard">Standard — ۵۰ تومان/تراکنش</option>
+          <option value="professional">Professional — ۴۰ تومان/تراکنش</option>
+          <option value="enterprise" selected>Enterprise — ۳۰ تومان/تراکنش</option>
+          <option value="sovereign">Sovereign — ۲۰ تومان/تراکنش</option>
+        </select>
+      </div>
+      <div class="calc-row">
+        <label>حجم (میلیون تراکنش)</label>
+        <input type="number" id="vol" value="50" min="1" max="10000">
+      </div>
+      <div class="calc-row">
+        <label>مدت (روز)</label>
+        <input type="number" id="days" value="365" min="30" max="3650">
+      </div>
+      <div class="calc-result">
+        <div class="calc-result-label">هزینه کل</div>
+        <div class="calc-result-val" id="total">۰ <span class="cur">تومان</span></div>
+        <div class="calc-detail" id="detail"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- NETWORK -->
+<section class="section blocks-section" id="network">
+  <div class="section-inner">
+    <div class="section-head">
+      <div class="eyebrow">شبکه زنده</div>
+      <h2>آخرین بلوک‌های بلاکچین</h2>
+      <p>بلوک‌های واقعی با امضای ECDSA و Merkle Proof، به‌روزرسانی لحظه‌ای.</p>
+    </div>
+    <div class="blocks-grid">
+      <div class="block-card genesis">
+        <div class="block-idx">#0</div>
+        <div class="block-tag">GENESIS</div>
+        <div class="block-hash">9b1976ddb9c279ee257c828f9ea6de30c1...</div>
+        <div class="block-meta"><span>۰ تراکنش</span><span>شروع</span></div>
+      </div>
+      <div class="block-card">
+        <div class="block-idx">#1</div>
+        <div class="block-hash">94829fa6c37ec23ac3bd6681f6a2b8e4c1...</div>
+        <div class="block-meta"><span>۳ تراکنش</span><span>Merkle ✓</span></div>
+      </div>
+      <div class="block-card">
+        <div class="block-idx">#2</div>
+        <div class="block-hash">8247b1838140ccbeb907fd7193c5f7e2a9...</div>
+        <div class="block-meta"><span>۳ تراکنش</span><span>Merkle ✓</span></div>
+      </div>
+      <div class="block-card">
+        <div class="block-idx">#3</div>
+        <div class="block-hash">c85838c1beb5602bf960275b4a8d6f1c7e...</div>
+        <div class="block-meta"><span>۱ تراکنش</span><span>همگام‌شده</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CLIENTS -->
+<section class="section clients-section" id="clients">
+  <div class="section-inner">
+    <div class="section-head">
+      <div class="eyebrow">مشتریان</div>
+      <h2>صنایع هدف ما</h2>
+      <p>راه‌حل Horizon برای سازمان‌های زیر طراحی شده — در حال جذب اولین مشتریان پایلوت.</p>
+    </div>
+    <div class="clients-grid">
+      <div class="client-card"><div class="client-icon">🏦</div><div class="client-name">بانکداری</div><div class="client-type">بانکداری</div></div>
+      <div class="client-card"><div class="client-icon">🛢️</div><div class="client-name">صنایع نفت و گاز</div><div class="client-type">صنعت نفت</div></div>
+      <div class="client-card"><div class="client-icon">⚡</div><div class="client-name">مدیریت برق</div><div class="client-type">صنعت برق</div></div>
+      <div class="client-card"><div class="client-icon">🏗️</div><div class="client-name">صنعت فولاد</div><div class="client-type">صنعت فولاد</div></div>
+      <div class="client-card"><div class="client-icon">🥉</div><div class="client-name">صنعت مس</div><div class="client-type">معدن و مس</div></div>
+      <div class="client-card"><div class="client-icon">🏭</div><div class="client-name">پالایشگاه‌ها</div><div class="client-type">صنعت نفت</div></div>
+      <div class="client-card"><div class="client-icon">⛽</div><div class="client-name">صنعت گاز</div><div class="client-type">صنعت گاز</div></div>
+      <div class="client-card"><div class="client-icon">🛢️</div><div class="client-name">پالایش نفت</div><div class="client-type">صنعت نفت</div></div>
+      <div class="client-card"><div class="client-icon">⚡</div><div class="client-name">مدیریت برق</div><div class="client-type">صنعت برق</div></div>
+      <div class="client-card"><div class="client-icon">🥉</div><div class="client-name">صنایع معدنی</div><div class="client-type">معدن و مس</div></div>
+      <div class="client-card"><div class="client-icon">🏗️</div><div class="client-name">صنایع فلزی</div><div class="client-type">صنعت فولاد</div></div>
+      <div class="client-card"><div class="client-icon">🏭</div><div class="client-name">صنایع پتروشیمی</div><div class="client-type">پتروشیمی</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta">
+  <h2>آماده شروع هستید؟</h2>
+  <p>تیم Horizon آماده ارائه دمو و مشاوره رایگان برای سازمان شماست.</p>
+  <button class="cta-btn">درخواست دمو رایگان</button>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="logo">
+    <span class="mark">◆</span> Horizon
+  </div>
+  <div>© ۲۰۲۶ Horizon — بلاکچین اختصاصی ایران</div>
+  <div style="margin-top:8px;font-size:12px;opacity:0.5">طراحی و توسعه: مهدی آملی مقدم</div>
+</footer>
+
+<script>
+// ============ CALCULATOR ============
+const PRICES = {
+  standard:     { perTx: 50, sub: 50_000_000 },
+  professional: { perTx: 40, sub: 100_000_000 },
+  enterprise:   { perTx: 30, sub: 200_000_000 },
+  sovereign:    { perTx: 20, sub: 500_000_000 }
+};
+
+function fmt(n) {
+  return Number(n).toLocaleString('fa-IR');
+}
+
+function calc() {
+  const tier = document.getElementById('tier').value;
+  const vol = parseInt(document.getElementById('vol').value) || 0;
+  const days = parseInt(document.getElementById('days').value) || 0;
+  const p = PRICES[tier];
+  const txCost = vol * 1_000_000 * p.perTx;
+  const total = txCost + p.sub;
+
+  document.getElementById('total').innerHTML =
+    fmt(total) + ' <span class="cur">تومان</span>';
+
+  document.getElementById('detail').innerHTML =
+    'هزینه تراکنش: ' + fmt(txCost) + ' تومان<br>' +
+    'اشتراک پایه: ' + fmt(p.sub) + ' تومان<br>' +
+    'نرخ هر تراکنش: ' + p.perTx + ' تومان — مدت: ' + days + ' روز';
+}
+
+document.getElementById('tier').addEventListener('change', calc);
+document.getElementById('vol').addEventListener('input', calc);
+document.getElementById('days').addEventListener('input', calc);
+calc();
+</script>
+
+</body>
+</html>
