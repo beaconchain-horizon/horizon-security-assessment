@@ -13,3 +13,4 @@ config.local.js
 .env.*
 *.key
 *.pem
+customers.json

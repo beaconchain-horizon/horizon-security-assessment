@@ -523,7 +523,7 @@ document.getElementById('offline-close').onclick = () => offPanel.classList.remo
 <script src="offline-fallback.js">
 
 // ==================== HORIZON LICENSE + CHAT (REAL) ====================
-const _P={p:BigInt('0x4E94F10F0a34a0DF229e68d5902644046258D678ffffffffffffffffffffffff'),a:BigInt('0x4E94F10F0a34a0DF229e68d5902644046258D678fffffffffffffffffffffffc'),Gx:BigInt('0x4E94F10F0a34a0DF229e68d5902644046258D6782deb33a0f4a13945d898c296'),Gy:BigInt('0x4E94F10F0a34a0DF229e68d5902644046258D6786b315ececbb6406837bf51f5')};
+const _P={p:BigInt('0xffffffff00000001000000000000000000000000ffffffffffffffffffffffff'),a:BigInt('0xffffffff00000001000000000000000000000000fffffffffffffffffffffffc'),Gx:BigInt('0x6b17d1f2e12c4247f8bce6e563a440f277037d812deb33a0f4a13945d898c296'),Gy:BigInt('0x4fe342e2fe1a7f9b8ee7eb4a7c0f9e162bce33576b315ececbb6406837bf51f5')};
 const _m=(a,m)=>((a%m)+m)%m;
 function _inv(a,m){let[o,r]=[a,m],[os,s]=[1n,0n];while(r!==0n){const q=o/r;[o,r]=[r,o-q*r];[os,s]=[s,os-q*s];}return _m(os,m);}
 function _add(P,Q){if(!P)return Q;if(!Q)return P;const[x1,y1]=P,[x2,y2]=Q;if(x1===x2&&_m(y1+y2,_P.p)===0n)return null;let l;if(x1===x2&&y1===y2)l=_m((3n*x1*x1+_P.a)*_inv(2n*y1,_P.p),_P.p);else l=_m((y2-y1)*_inv(x2-x1,_P.p),_P.p);const x3=_m(l*l-x1-x2,_P.p);return[x3,_m(l*(x1-x3)-y1,_P.p)];}

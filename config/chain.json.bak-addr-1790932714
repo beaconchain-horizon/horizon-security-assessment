@@ -3,6 +3,6 @@
   "network_name": "Example Organization Private Network",
   "created_at": "2026-09-12",
   "description": "Air-gapped private network for industrial data (sanitized example)",
-  "admin_public_key": "0x4E94F10F0a34a0DF229e68d5902644046258D678",
+  "admin_public_key": "0x0000000000000000000000000000000000000000",
   "air_gap_allowed": true
 }
