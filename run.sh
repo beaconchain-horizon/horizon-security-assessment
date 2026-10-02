@@ -18,10 +18,10 @@ echo ""
 
 CFG="$(pwd)/config/chain.json"
 API="http://127.0.0.1:8080/api/v1"
-TOK="X-Admin-Token: bench"
+TOK="X-Admin-Token: bench-0123456789abcdef0123456789ab"
 
 echo "[2/7] Starting server (in-memory DB)..."
-(SWITCH_DB=:memory: CHAIN_CONFIG="$CFG" ADMIN_TOKEN=bench GIN_MODE=release ./bin/switch > /tmp/a.log 2>&1 &)
+(SWITCH_DB=:memory: CHAIN_CONFIG="$CFG" ADMIN_TOKEN=bench-0123456789abcdef0123456789ab GIN_MODE=release ./bin/switch > /tmp/a.log 2>&1 &)
 sleep 5
 echo "      OK"
 echo ""

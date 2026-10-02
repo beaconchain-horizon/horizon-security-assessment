@@ -3,7 +3,7 @@
 cd "$(dirname "$0")"
 
 API="http://127.0.0.1:8080/api/v1"
-TOK="X-Admin-Token: bench"
+TOK="X-Admin-Token: bench-0123456789abcdef0123456789ab"
 
 PASS=0
 FAIL=0
