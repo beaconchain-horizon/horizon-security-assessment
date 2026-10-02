@@ -16,3 +16,6 @@ config.local.js
 customers.json
 *.bak-*
 *.bak2.*
+*.backup-*
+*.old
+*.tmp
