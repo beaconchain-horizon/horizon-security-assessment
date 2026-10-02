@@ -34,7 +34,7 @@ Include:
 
 ## Security Model
 
-- **Cryptography**: ECDSA P-256 (FIPS 186-4 standard)
+- **Cryptography**: ECDSA P-256 (FIPS 186-5 standard)
 - **Key Management**: Key rotation (90 days), Shamir Secret Sharing, Dual Control, Auto-Lock
 - **Replay Protection**: Nonce + timestamp window (5 minutes)
 - **Supply Chain**: Dependabot, govulncheck, gosec (weekly)

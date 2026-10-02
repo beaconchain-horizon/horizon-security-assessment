@@ -68,7 +68,7 @@ cd horizon-security-assessment
 - CORS Whitelist
 
 ### Layer 3 — Key Protection
-- ECDSA P-256 (FIPS 186-4)
+- ECDSA P-256 (FIPS 186-5)
 - Key Rotation (90 days)
 - Auto-Lock (30 min inactivity)
 - Manual Lock endpoint
