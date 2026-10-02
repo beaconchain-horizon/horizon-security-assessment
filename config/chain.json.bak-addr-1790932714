@@ -1,8 +1,0 @@
-{
-  "chain_id": "example-org-01",
-  "network_name": "Example Organization Private Network",
-  "created_at": "2026-09-12",
-  "description": "Air-gapped private network for industrial data (sanitized example)",
-  "admin_public_key": "0x0000000000000000000000000000000000000000",
-  "air_gap_allowed": true
-}

@@ -14,3 +14,5 @@ config.local.js
 *.key
 *.pem
 customers.json
+*.bak-*
+*.bak2.*
