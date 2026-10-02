@@ -9,10 +9,10 @@ Environment: Windows 10, 8-core CPU, GOMAXPROCS=8
 |------|----------|----------|-----|
 | Warmup | 10,000 | 156ms | 64,102 |
 | Standard | 50,000 | 279ms | 179,211 |
-| High Load | 100,000 | 416ms | **240,384** |
+| High Load | 100,000 | 416ms | **245,098** |
 | Stress | 500,000 | - | rejected (limit 100K) |
 
-**Peak measured: 240,384 TPS** at 100,000 TX per batch request.
+**Peak measured: 245,098 TPS** at 100,000 TX per batch request.
 
 ## Verified End-to-End
 
@@ -27,7 +27,7 @@ Batcher flush is INCOMPLETE under extreme load:
 - Flushed to chain: 16,273
 - Ratio: ~10%
 
-The peak 240,384 TPS measures **ledger ingestion + block creation rate**,
+The peak 245,098 TPS measures **ledger ingestion + block creation rate**,
 NOT sustained end-to-end throughput for a complete workload.
 
 Root cause: async batcher contention — multiple Flush goroutines compete
@@ -45,7 +45,7 @@ for chainMutex. Full design fix (batcher v2) deferred.
 | Date | Type | TPS |
 |------|------|-----|
 | 2026-09 | Industrial reading (tpsbench) | 32,849 |
-| 2026-10 | Banking batch (peak) | 240,384 |
+| 2026-10 | Banking batch (peak) | 245,098 |
 | 2026-10 | Banking batch (sustained) | ~10,000 |
 
 ## Reproduce
