@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Horizon Core — پنل مشتری</title>
+<style>
+:root{--bg:#0a0e1a;--card:#1a2233;--gold:#d4a340;--gold2:#f4c96b;--text:#e8eaf0;--muted:#8892a6;--border:rgba(212,163,64,.18);--green:#34d399;--red:#f87171;--blue:#60a5fa;--r:14px}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',Tahoma,sans-serif;background:var(--bg);color:var(--text);line-height:1.7;min-height:100vh}
+.wrap{max-width:1200px;margin:0 auto;padding:24px}
+.hdr{display:flex;justify-content:space-between;align-items:center;padding:16px 0;border-bottom:1px solid var(--border);margin-bottom:28px}
+.logo{display:flex;align-items:center;gap:10px;font-weight:700;font-size:18px}
+.logo-mark{width:36px;height:36px;border-radius:9px;background:linear-gradient(135deg,var(--gold),var(--gold2));display:grid;place-items:center;color:#0a0e1a;font-weight:900;font-size:16px}
+.status{padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700;background:rgba(52,211,153,.15);color:var(--green)}
+.status.off{background:rgba(248,113,113,.15);color:var(--red)}
+.screen{display:none}.screen.active{display:block}
+/* Login */
+.login-box{max-width:460px;margin:60px auto;background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:36px 28px}
+.login-box::before{content:'';display:block;width:100%;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);margin:-36px -28px 32px;width:calc(100% + 56px)}
+.login-title{font-size:20px;font-weight:800;text-align:center;margin-bottom:24px}
+.field{margin-bottom:16px}
+.field label{display:block;font-size:13px;font-weight:600;margin-bottom:6px}
+.field input{width:100%;padding:12px 16px;background:var(--bg);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:inherit;font-size:14px;direction:ltr}
+.field input:focus{outline:none;border-color:var(--gold)}
+.btn{width:100%;padding:13px;border-radius:10px;font-weight:700;font-family:inherit;cursor:pointer;font-size:14px;transition:.2s;border:none;margin-top:8px}
+.btn-primary{background:linear-gradient(135deg,var(--gold),var(--gold2));color:#0a0e1a}
+.btn-primary:hover{transform:translateY(-1px)}
+.btn-ghost{background:transparent;border:1px solid var(--border);color:var(--text)}
+.btn-sm{padding:8px 16px;font-size:12px;width:auto;margin:0}
+/* Dashboard */
+.nav{display:flex;gap:8px;margin-bottom:24px;flex-wrap:wrap;padding:12px;background:var(--card);border-radius:var(--r);border:1px solid var(--border)}
+.nav button{padding:10px 18px;background:transparent;border:none;color:var(--muted);font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;border-radius:8px;transition:.2s}
+.nav button:hover{color:var(--text)}
+.nav button.active{background:var(--gold);color:#0a0e1a}
+.grid-4{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:24px}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:20px;position:relative;overflow:hidden}
+.stat-card::before{content:'';position:absolute;top:0;left:0;width:4px;height:100%;background:linear-gradient(180deg,var(--gold),var(--gold2))}
+.stat-lbl{font-size:11px;color:var(--muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:1.2px;font-weight:600}
+.stat-val{font-size:26px;font-weight:800;color:var(--text);letter-spacing:-.8px}
+.stat-val.gold{color:var(--gold)}
+.stat-sub{font-size:11px;color:var(--muted);margin-top:6px}
+.section{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:24px;margin-bottom:20px}
+.section-title{font-size:16px;font-weight:700;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--border)}
+.page{display:none}.page.active{display:block}
+.row-card{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin-bottom:8px;display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;font-size:13px}
+.row-card .mono{font-family:monospace;font-size:11px;color:var(--muted);direction:ltr}
+.row-card .val{font-weight:700;color:var(--gold);font-size:15px}
+.badge{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:10px;font-weight:700}
+.badge-green{background:rgba(52,211,153,.15);color:var(--green)}
+.badge-gold{background:rgba(212,163,64,.15);color:var(--gold)}
+.badge-red{background:rgba(248,113,113,.15);color:var(--red)}
+.badge-gray{background:rgba(136,146,166,.15);color:var(--muted)}
+.dot{width:5px;height:5px;border-radius:50%;background:currentColor}
+.alert{padding:12px 16px;border-radius:10px;font-size:13px;margin-bottom:16px}
+.alert-warn{background:rgba(212,163,64,.1);border:1px solid rgba(212,163,64,.3);color:var(--gold2)}
+.alert-err{background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.3);color:#fca5a5}
+.alert-ok{background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.3);color:#6ee7b7}
+.mono{font-family:monospace;direction:ltr;font-size:12px;color:var(--muted);word-break:break-all}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:right;color:var(--muted);font-weight:600;font-size:11px;text-transform:uppercase;padding:10px 12px;border-bottom:1px solid var(--border)}
+td{padding:12px;border-bottom:1px solid rgba(212,163,64,.08)}
+.log{background:#000;color:#0f0;font-family:monospace;font-size:11px;padding:12px;border-radius:8px;max-height:200px;overflow-y:auto;direction:ltr;white-space:pre-wrap;margin-top:12px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- ═══════════ LOGIN ═══════════ -->
+<div class="screen active" id="s-login">
+  <div class="login-box">
+    <div class="logo" style="justify-content:center;margin-bottom:20px">
+      <div class="logo-mark">H</div><span>Horizon Core</span>
+    </div>
+    <div class="login-title">اتصال به سرور</div>
+    <div class="field">
+      <label>آدرس سرور</label>
+      <input id="srv" value="http://127.0.0.1:8080" placeholder="http://127.0.0.1:8080">
+    </div>
+    <div class="field">
+      <label>Admin Token</label>
+      <input id="tok" type="password" placeholder="توکن مدیریت">
+    </div>
+    <button class="btn btn-primary" onclick="login()">اتصال</button>
+    <div class="alert alert-warn" style="margin-top:16px;font-size:12px">
+      سرور باید در حال اجرا باشد. اگر مطمئن نیستید، <span class="mono">./bin/switch.exe --port 8080</span> را اجرا کنید.
+    </div>
+    <div id="login-err" class="alert alert-err" style="display:none;margin-top:12px"></div>
+  </div>
+</div>
+
+<!-- ═══════════ APP ═══════════ -->
+<div class="screen" id="s-app">
+  <div class="hdr">
+    <div class="logo"><div class="logo-mark">H</div><span>Horizon Core</span></div>
+    <div style="display:flex;gap:12px;align-items:center">
+      <span class="status" id="conn-status">آماده</span>
+      <button class="btn btn-ghost btn-sm" onclick="logout()">خروج</button>
+    </div>
+  </div>
+
+  <div class="nav">
+    <button class="active" onclick="go('dash',this)">🏠 داشبورد</button>
+    <button onclick="go('chain',this)">⛓ زنجیره</button>
+    <button onclick="go('licenses',this)">🔑 لایسنس‌ها</button>
+    <button onclick="go('tx',this)">💳 تراکنش</button>
+    <button onclick="go('accounts',this)">👥 حساب‌ها</button>
+    <button onclick="go('api',this)">🔌 API</button>
+  </div>
+
+  <!-- Dash -->
+  <div class="page active" id="p-dash">
+    <div class="grid-4" id="stats">
+      <div class="stat-card"><div class="stat-lbl">وضعیت</div><div class="stat-val gold" id="d-status">—</div></div>
+      <div class="stat-card"><div class="stat-lbl">بلاک‌ها</div><div class="stat-val" id="d-blocks">—</div></div>
+      <div class="stat-card"><div class="stat-lbl">تراکنش‌ها</div><div class="stat-val" id="d-txs">—</div></div>
+      <div class="stat-card"><div class="stat-lbl">کارگران امضا</div><div class="stat-val" id="d-workers">—</div></div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">خلاصه سریع</div>
+      <div id="quick-summary" class="mono">در حال بارگذاری...</div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">آخرین رویدادها</div>
+      <div class="log" id="log-dash">آماده</div>
+    </div>
+  </div>
+
+  <!-- Chain -->
+  <div class="page" id="p-chain">
+    <div class="section">
+      <div class="section-title">وضعیت زنجیره</div>
+      <div style="display:flex;gap:8px;margin-bottom:16px">
+        <button class="btn btn-primary btn-sm" onclick="loadChainStats()">بروزرسانی</button>
+        <button class="btn btn-ghost btn-sm" onclick="flushChain()">Flush دستی</button>
+      </div>
+      <div id="chain-stats" class="mono">—</div>
+    </div>
+    <div class="section">
+      <div class="section-title">لیست بلاک‌ها</div>
+      <button class="btn btn-primary btn-sm" onclick="loadBlocks()" style="margin-bottom:12px">بارگذاری بلاک‌ها</button>
+      <table><thead><tr><th>شماره</th><th>Hash</th><th>TX</th><th>زمان</th></tr></thead>
+      <tbody id="blocks-body"><tr><td colspan="4" style="text-align:center;color:var(--muted)">بارگذاری نشده</td></tr></tbody></table>
+    </div>
+  </div>
+
+  <!-- Licenses -->
+  <div class="page" id="p-licenses">
+    <div class="section">
+      <div class="section-title">لایسنس‌های فعال</div>
+      <div style="display:flex;gap:8px;margin-bottom:16px">
+        <button class="btn btn-primary btn-sm" onclick="loadLicenses()">بروزرسانی</button>
+        <button class="btn btn-ghost btn-sm" onclick="loadLicenseStatus()">وضعیت جاری</button>
+      </div>
+      <div id="licenses-list" class="mono">—</div>
+    </div>
+    <div class="section">
+      <div class="section-title">صدور لایسنس جدید</div>
+      <div class="field"><label>License ID</label><input id="lic-id" placeholder="HZ-BANK-001"></div>
+      <div class="field"><label>User ID</label><input id="lic-user" placeholder="bank-melli"></div>
+      <div class="field"><label>حجم</label><input id="lic-vol" type="number" value="1000000"></div>
+      <div class="field"><label>مدت (روز)</label><input id="lic-dur" type="number" value="365"></div>
+      <button class="btn btn-primary" onclick="issueLicense()">صدور</button>
+      <div id="lic-result" class="log" style="display:none"></div>
+    </div>
+  </div>
+
+  <!-- TX -->
+  <div class="page" id="p-tx">
+    <div class="section">
+      <div class="section-title">تراکنش جدید</div>
+      <div class="field"><label>از</label><input id="tx-from" placeholder="bank-a"></div>
+      <div class="field"><label>به</label><input id="tx-to" placeholder="bank-b"></div>
+      <div class="field"><label>مبلغ</label><input id="tx-amt" type="number" value="100"></div>
+      <button class="btn btn-primary" onclick="sendTx()">ارسال (single)</button>
+      <button class="btn btn-ghost" onclick="sendBatch()" style="margin-top:8px">ارسال Batch (100)</button>
+      <div id="tx-result" class="log" style="display:none"></div>
+    </div>
+  </div>
+
+  <!-- Accounts -->
+  <div class="page" id="p-accounts">
+    <div class="section">
+      <div class="section-title">حساب‌ها</div>
+      <button class="btn btn-primary btn-sm" onclick="loadAccounts()" style="margin-bottom:12px">بارگذاری</button>
+      <div id="accounts-list" class="mono">—</div>
+    </div>
+  </div>
+
+  <!-- API -->
+  <div class="page" id="p-api">
+    <div class="section">
+      <div class="section-title">پاسخ خام API</div>
+      <div class="field"><label>Endpoint</label><input id="api-path" value="/api/v1/chain/info"></div>
+      <div class="field"><label>Method</label>
+        <select id="api-method" style="width:100%;padding:12px;background:var(--bg);border:1px solid var(--border);border-radius:10px;color:var(--text)">
+          <option>GET</option><option>POST</option>
+        </select>
+      </div>
+      <div class="field"><label>Body (JSON)</label><input id="api-body" placeholder='{"key":"value"}'></div>
+      <button class="btn btn-primary" onclick="callApi()">ارسال</button>
+      <div id="api-result" class="log" style="display:none"></div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════
+// State
+// ═══════════════════════════════════════════
+const S = {
+  srv: '',
+  tok: '',
+  sessionToken: '',
+};
+
+// ═══════════════════════════════════════════
+// Screen management
+// ═══════════════════════════════════════════
+function show(id){
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function go(page, btn){
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('p-' + page).classList.add('active');
+  document.querySelectorAll('.nav button').forEach(b => b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  if(page === 'dash') loadDash();
+}
+
+function log(txt, id){
+  const el = document.getElementById(id || 'log-dash');
+  if(!el) return;
+  el.style.display = 'block';
+  el.textContent = typeof txt === 'string' ? txt : JSON.stringify(txt, null, 2);
+}
+
+// ═══════════════════════════════════════════
+// HTTP helpers
+// ═══════════════════════════════════════════
+async function api(path, opts){
+  opts = opts || {};
+  const url = S.srv + path;
+  const headers = {
+    'X-Admin-Token': S.tok,
+    'Content-Type': 'application/json',
+    ...(opts.headers || {})
+  };
+  if(opts.method === 'POST' && S.sessionToken && opts.useSession){
+    headers['X-Session-Token'] = S.sessionToken;
+  }
+  const res = await fetch(url, { ...opts, headers });
+  const text = await res.text();
+  let data;
+  try { data = JSON.parse(text); } catch { data = text; }
+  return { status: res.status, data };
+}
+
+function setStatus(txt, cls){
+  const el = document.getElementById('conn-status');
+  el.textContent = txt;
+  el.className = 'status' + (cls === 'off' ? ' off' : '');
+}
+
+// ═══════════════════════════════════════════
+// Login / Logout
+// ═══════════════════════════════════════════
+async function login(){
+  const srv = document.getElementById('srv').value.trim();
+  const tok = document.getElementById('tok').value.trim();
+  const err = document.getElementById('login-err');
+  err.style.display = 'none';
+
+  if(!srv || !tok){
+    err.style.display = 'block';
+    err.textContent = 'آدرس و توکن الزامی است';
+    return;
+  }
+
+  S.srv = srv;
+  S.tok = tok;
+
+  try {
+    const r = await api('/api/v1/health');
+    if(r.status === 200){
+      setStatus('متصل', 'on');
+      show('s-app');
+      loadDash();
+    } else {
+      err.style.display = 'block';
+      err.textContent = 'خطا: ' + JSON.stringify(r.data);
+    }
+  } catch(e){
+    err.style.display = 'block';
+    err.textContent = 'اتصال برقرار نشد — سرور بالا نیست؟';
+  }
+}
+
+function logout(){
+  S.tok = '';
+  S.sessionToken = '';
+  document.getElementById('tok').value = '';
+  show('s-login');
+}
+
+// ═══════════════════════════════════════════
+// Dashboard
+// ═══════════════════════════════════════════
+async function loadDash(){
+  log('بارگذاری...', 'log-dash');
+
+  const h = await api('/api/v1/health');
+  document.getElementById('d-status').textContent = h.data.status || '—';
+
+  const chain = await api('/api/v1/chain/stats');
+  if(chain.status === 200 && chain.data){
+    document.getElementById('d-blocks').textContent = chain.data.total_blocks || 0;
+    document.getElementById('d-txs').textContent = (chain.data.total_flushed || 0).toLocaleString('fa-IR');
+    document.getElementById('d-workers').textContent = chain.data.workers || 0;
+  }
+
+  const info = await api('/api/v1/chain/info');
+  document.getElementById('quick-summary').textContent = JSON.stringify(info.data, null, 2);
+
+  log(JSON.stringify({health: h.data, chain: chain.data, info: info.data}, null, 2), 'log-dash');
+}
+
+// ═══════════════════════════════════════════
+// Chain
+// ═══════════════════════════════════════════
+async function loadChainStats(){
+  const r = await api('/api/v1/chain/stats');
+  document.getElementById('chain-stats').textContent = JSON.stringify(r.data, null, 2);
+}
+
+async function flushChain(){
+  const r = await api('/api/v1/chain/flush', { method: 'POST' });
+  alert('Flush: ' + JSON.stringify(r.data));
+}
+
+async function loadBlocks(){
+  const r = await api('/api/v1/block/list');
+  const tbody = document.getElementById('blocks-body');
+
+  if(r.status !== 200 || !Array.isArray(r.data)){
+    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--red)">خطا در بارگذاری</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = r.data.slice(0, 30).map(b => `
+    <tr>
+      <td>#${b.block_num || b.id || '—'}</td>
+      <td class="mono">${(b.hash || '—').slice(0, 20)}...</td>
+      <td>${b.tx_count || 0}</td>
+      <td style="font-size:12px;color:var(--muted)">${b.created_at ? new Date(b.created_at).toLocaleString('fa-IR') : '—'}</td>
+    </tr>
+  `).join('') || '<tr><td colspan="4" style="text-align:center;color:var(--muted)">هیچ بلاکی نیست</td></tr>';
+}
+
+// ═══════════════════════════════════════════
+// Licenses
+// ═══════════════════════════════════════════
+async function loadLicenses(){
+  const r = await api('/api/v1/license/list');
+  document.getElementById('licenses-list').textContent = JSON.stringify(r.data, null, 2);
+}
+
+async function loadLicenseStatus(){
+  const r = await api('/api/v1/license/status');
+  document.getElementById('licenses-list').textContent = JSON.stringify(r.data, null, 2);
+}
+
+async function issueLicense(){
+  const body = {
+    license_id: document.getElementById('lic-id').value,
+    user_id: document.getElementById('lic-user').value,
+    volume: parseInt(document.getElementById('lic-vol').value),
+    duration: parseInt(document.getElementById('lic-dur').value),
+  };
+  const r = await api('/api/v1/admin/license/issue', {
+    method: 'POST',
+    body: JSON.stringify(body)
+  });
+  log(JSON.stringify({status: r.status, data: r.data}, null, 2), 'lic-result');
+}
+
+// ═══════════════════════════════════════════
+// TX
+// ═══════════════════════════════════════════
+async function getSession(){
+  const r = await api('/api/v1/signing/session', { method: 'POST' });
+  return r.data.session_token;
+}
+
+async function sendTx(){
+  try {
+    S.sessionToken = await getSession();
+    const body = {
+      from: document.getElementById('tx-from').value,
+      to: document.getElementById('tx-to').value,
+      amount: parseFloat(document.getElementById('tx-amt').value),
+    };
+    const r = await api('/api/v1/tx', {
+      method: 'POST',
+      body: JSON.stringify(body),
+      useSession: true,
+    });
+    log(JSON.stringify({status: r.status, data: r.data}, null, 2), 'tx-result');
+  } catch(e){
+    log('Error: ' + e.message, 'tx-result');
+  }
+}
+
+async function sendBatch(){
+  try {
+    S.sessionToken = await getSession();
+    const from = document.getElementById('tx-from').value || 'batch-sender';
+    const txs = [];
+    for(let i = 0; i < 100; i++){
+      txs.push({ from: from, to: 'recv-' + i, amount: 1 });
+    }
+    const body = {
+      session_token: S.sessionToken,
+      txs: txs,
+    };
+    const r = await api('/api/v1/tx/batch', {
+      method: 'POST',
+      body: JSON.stringify(body)
+    });
+    log(JSON.stringify({status: r.status, data: r.data}, null, 2), 'tx-result');
+  } catch(e){
+    log('Error: ' + e.message, 'tx-result');
+  }
+}
+
+// ═══════════════════════════════════════════
+// Accounts
+// ═══════════════════════════════════════════
+async function loadAccounts(){
+  const r = await api('/api/v1/account/list');
+  document.getElementById('accounts-list').textContent = JSON.stringify(r.data, null, 2);
+}
+
+// ═══════════════════════════════════════════
+// API Explorer
+// ═══════════════════════════════════════════
+async function callApi(){
+  const path = document.getElementById('api-path').value;
+  const method = document.getElementById('api-method').value;
+  const body = document.getElementById('api-body').value;
+
+  const opts = { method };
+  if(method === 'POST' && body) opts.body = body;
+
+  try {
+    const r = await api(path, opts);
+    log('Status: ' + r.status + '\n\n' + JSON.stringify(r.data, null, 2), 'api-result');
+  } catch(e){
+    log('Error: ' + e.message, 'api-result');
+  }
+}
+</script>
+</body>
+</html>
