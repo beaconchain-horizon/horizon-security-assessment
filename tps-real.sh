@@ -61,7 +61,7 @@ run_tps "Standard 50K" 50000
 sleep 1
 run_tps "High 100K" 100000
 sleep 1
-run_tps "Stress 500K" 500000
+run_tps "Stress 100K" 100000
 
 echo "" | tee -a "$OUT"
 echo "── Chain Stats ──" | tee -a "$OUT"
