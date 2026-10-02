@@ -1,0 +1,322 @@
+cat > ~/Desktop/webapp-live.html << 'HTMLEOF'
+<head>
+<meta charset="UTF-8">
+<title>Horizon Core — پنل زنده</title>
+<style>
+:root{--bg:#0a0e1a;--card:#1a2233;--gold:#d4a340;--gold2:#f4c96b;--text:#e8eaf0;--muted:#8892a6;--border:rgba(212,163,64,.18);--green:#34d399;--red:#f87171;--blue:#60a5fa;--r:14px}
+body{font-family:'Segoe UI',Tahoma,sans-serif;background:var(--bg);color:var(--text);line-height:1.7;min-height:100vh;padding:24px}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(600px 400px at 20% 10%,rgba(212,163,64,.06),transparent),radial-gradient(800px 500px at 80% 20%,rgba(96,165,250,.05),transparent);pointer-events:none}
+.wrap{max-width:1100px;margin:0 auto;position:relative;z-index:1}
+.hdr{display:flex;justify-content:space-between;align-items:center;padding:16px 0;border-bottom:1px solid var(--border);margin-bottom:24px}
+.logo-mark{width:36px;height:36px;border-radius:9px;background:linear-gradient(135deg,var(--gold),var(--gold2));display:grid;place-items:center;color:#0a0e1a;font-weight:900;font-size:16px}
+.conn{font-size:12px;padding:6px 14px;border-radius:20px;background:rgba(248,113,113,.15);color:var(--red)}
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:24px;margin-bottom:16px}
+.card h3::before{content:'';width:3px;height:18px;background:linear-gradient(180deg,var(--gold),var(--gold2));border-radius:2px}
+.row{margin-bottom:14px}
+label{display:block;font-size:13px;font-weight:600;margin-bottom:6px}
+input,select{width:100%;padding:11px 14px;background:var(--bg);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:inherit;font-size:14px}
+button{width:100%;padding:12px;border-radius:10px;font-weight:700;font-family:inherit;font-size:14px;cursor:pointer;border:none;margin-top:8px;transition:.2s}
+.btn-primary{background:linear-gradient(135deg,var(--gold),var(--gold2));color:#0a0e1a}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(212,163,64,.3)}
+.btn-secondary{background:transparent;border:1px solid var(--border);color:var(--text)}
+.btn-secondary:hover{border-color:var(--gold)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:16px}
+.stat{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px}
+.stat-lbl{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
+.stat-val{font-size:22px;font-weight:800;color:var(--gold)}
+.log{background:#000;color:var(--green);font-family:'Courier New',monospace;font-size:12px;padding:14px;border-radius:10px;max-height:240px;overflow-y:auto;direction:ltr;text-align:left}
+.log-err{color:var(--red)}
+.log-ok{color:var(--green)}
+.log-info{color:var(--blue)}
+.tabs{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap}
+.tab{padding:9px 20px;background:var(--card);border:1px solid var(--border);border-radius:10px;color:var(--muted);cursor:pointer;font-size:13px;font-weight:600;font-family:inherit}
+.tab.active{background:var(--gold);color:#0a0e1a;border-color:var(--gold)}
+.panel{display:none}
+.panel.active{display:block}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="hdr">
+    <div class="logo">
+        <div class="logo-mark">H</div>
+        <span>Horizon Core</span>
+    </div>
+    <div class="conn" id="connStatus">⚠ متصل نیست</div>
+</div>
+
+<div class="tabs">
+    <button class="tab active" onclick="showTab('setup', this)">🔌 اتصال</button>
+    <button class="tab" onclick="showTab('tx', this)">💳 تراکنش</button>
+    <button class="tab" onclick="showTab('chain', this)">⛓️ زنجیره</button>
+    <button class="tab" onclick="showTab('log', this)">📋 لاگ</button>
+</div>
+
+<!-- TAB 1: Setup -->
+<div class="panel active" id="panel-setup">
+    <div class="card">
+        <h3>اتصال به سرور</h3>
+        <div class="row">
+            <label>آدرس سرور</label>
+            <input id="apiUrl" value="http://127.0.0.1:8080/api/v1" dir="ltr">
+        </div>
+        <div class="row">
+            <label>Admin Token</label>
+            <input id="adminToken" type="password" placeholder="حداقل ۳۲ کاراکتر" dir="ltr">
+        <button class="btn-primary" onclick="testConnection()">تست اتصال</button>
+    </div>
+
+    <div class="card">
+        <h3>مدیریت کلید امضا</h3>
+        <div class="row">
+            <label>کلید خصوصی (hex 64 کاراکتر) — فقط برای تست</label>
+        </div>
+        <div class="row">
+            <label>رمز عبور کلید</label>
+            <input id="keyPassword" type="password" placeholder="رمز" dir="ltr">
+        <button class="btn-secondary" onclick="setupKey()">۱. ذخیره کلید</button>
+    </div>
+
+    <div class="card">
+        <h3>وضعیت سیستم</h3>
+        <div class="grid">
+            <div class="stat"><div class="stat-lbl">Key</div><div class="stat-val" id="sKey">—</div></div>
+            <div class="stat"><div class="stat-lbl">License</div><div class="stat-val" id="sLic">—</div></div>
+            <div class="stat"><div class="stat-lbl">Server</div><div class="stat-val" id="sSrv">—</div></div>
+        <button class="btn-secondary" onclick="refreshStatus()">🔄 به‌روزرسانی</button>
+    </div>
+
+    <div class="card">
+        <h3>صدور لایسنس</h3>
+        <div class="row">
+            <label>شناسه لایسنس</label>
+            <input id="licId" value="HZ-BANK-001" dir="ltr">
+        </div>
+        <div class="row">
+            <label>شناسه سازمان</label>
+            <input id="licUser" value="bank-melli" dir="ltr">
+        </div>
+        <div class="row">
+            <label>حجم (تراکنش)</label>
+            <input id="licVolume" type="number" value="1000000" dir="ltr">
+        </div>
+        <div class="row">
+            <label>مدت (روز)</label>
+            <input id="licDays" type="number" value="365" dir="ltr">
+        </div>
+        <button class="btn-primary" onclick="issueLicense()">📝 صدور لایسنس (به زنجیره اضافه می‌شود)</button>
+    </div>
+</div>
+
+<!-- TAB 2: Transactions -->
+<div class="panel" id="panel-tx">
+    <div class="card">
+        <h3>ارسال تراکنش (تک)</h3>
+        <div class="row"><label>از</label><input id="txFrom" value="bank-a" dir="ltr"></div>
+        <div class="row"><label>مبلغ</label><input id="txAmount" type="number" value="100" dir="ltr"></div>
+        <button class="btn-primary" onclick="sendTx()">ارسال تراکنش</button>
+    </div>
+
+    <div class="card">
+        <h3>ارسال دسته‌ای (Batch)</h3>
+        <div class="row"><label>مبلغ هر تراکنش</label><input id="batchAmount" type="number" value="1" dir="ltr"></div>
+
+    <div class="card">
+        <h3>Seed حساب</h3>
+        <div class="row"><label>شناسه حساب</label><input id="seedId" value="bank-a" dir="ltr"></div>
+</div>
+
+<!-- TAB 3: Chain -->
+<div class="panel" id="panel-chain">
+        <h3>وضعیت زنجیره</h3>
+        <button class="btn-primary" onclick="refreshChain()">🔄 دریافت وضعیت</button>
+
+    <div class="card">
+        <h3>Flush دستی</h3>
+        <p style="font-size:13px;color:var(--muted);margin-bottom:12px">اگر تراکنش‌ها در صف مانده‌اند، دستی به زنجیره بریز.</p>
+</div>
+
+<!-- TAB 4: Log -->
+    <div class="card">
+        <h3>لاگ عملیات</h3>
+        <button class="btn-secondary" onclick="clearLog()">پاک کردن</button>
+        <div class="log" id="log" style="margin-top:12px"></div>
+    </div>
+</div>
+
+</div>
+
+<script>
+const state = { api:'', token:'', session:null };
+
+function log(msg, type='info'){
+    const el = document.getElementById('log');
+    const t = new Date().toLocaleTimeString('fa-IR');
+    const cls = type === 'error' ? 'log-err' : type === 'ok' ? 'log-ok' : 'log-info';
+    el.innerHTML = `<div class="log-line ${cls}">[${t}] ${msg}</div>` + el.innerHTML;
+}
+
+function clearLog(){ document.getElementById('log').innerHTML=''; }
+
+function getConfig(){
+    state.api = document.getElementById('apiUrl').value.replace(/\/$/,'');
+    state.token = document.getElementById('adminToken').value;
+    return state;
+}
+
+async function api(path, opts={}){
+    const {api, token} = getConfig();
+    if(!token){ log('Admin Token خالی است', 'error'); throw new Error('no token'); }
+    const headers = Object.assign({'X-Admin-Token': token, 'Content-Type':'application/json'}, opts.headers||{});
+    const r = await fetch(api + path, Object.assign({}, opts, {headers}));
+    const text = await r.text();
+    let json = null;
+    try { json = JSON.parse(text); } catch(e){ json = { raw: text }; }
+    return {status: r.status, data: json};
+}
+
+function showTab(name, btn){
+    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('panel-'+name).classList.add('active');
+}
+
+function setConn(ok){
+    const el = document.getElementById('connStatus');
+    if(ok){ el.className='conn ok'; el.textContent='✓ متصل'; }
+    else { el.className='conn'; el.textContent='⚠ متصل نیست'; }
+}
+
+async function testConnection(){
+    try {
+        log('تست اتصال...');
+        const r = await api('/health');
+        if(r.status === 200){ setConn(true); log('اتصال موفق: ' + JSON.stringify(r.data), 'ok'); }
+    } catch(e){ setConn(false); log('خطا: ' + e.message, 'error'); }
+}
+
+async function setupKey(){
+    try {
+        const priv = document.getElementById('privKey').value;
+        const pass = document.getElementById('keyPassword').value;
+        if(!priv || !pass){ log('کلید و رمز لازم است', 'error'); return; }
+        log('ذخیره کلید...');
+        const r = await api('/key/setup', {method:'POST', body: JSON.stringify({private_key: priv, password: pass})});
+        log(JSON.stringify(r.data), r.status===200?'ok':'error');
+    } catch(e){ log(e.message, 'error'); }
+}
+
+async function unlockKey(){
+    try {
+        const pass = document.getElementById('keyPassword').value;
+        log('باز کردن قفل کلید...');
+        const r = await api('/key/unlock', {method:'POST', body: JSON.stringify({password: pass})});
+        setTimeout(refreshStatus, 1000);
+    } catch(e){ log(e.message, 'error'); }
+}
+
+async function refreshStatus(){
+    try {
+        const k = await api('/key/status');
+        document.getElementById('sKey').textContent = k.data.unlocked ? '✓ باز' : '✗ بسته';
+        document.getElementById('sKey').style.color = k.data.unlocked ? 'var(--green)' : 'var(--red)';
+        const l = await api('/license/status');
+        document.getElementById('sLic').textContent = l.data.has_license ? '✓ فعال' : '✗ ندارد';
+        document.getElementById('sLic').style.color = l.data.has_license ? 'var(--green)' : 'var(--red)';
+
+        const c = await api('/chain/stats');
+        document.getElementById('sBlocks').textContent = c.data.total_blocks ?? '—';
+        const h = await api('/health');
+        document.getElementById('sSrv').textContent = h.data.status || '—';
+        log('وضعیت به‌روز شد', 'ok');
+    } catch(e){ log(e.message, 'error'); }
+}
+
+async function issueLicense(){
+    try {
+        const body = {
+            license_id: document.getElementById('licId').value,
+            user_id: document.getElementById('licUser').value,
+            volume: parseInt(document.getElementById('licVolume').value),
+            duration: parseInt(document.getElementById('licDays').value)
+        };
+        log('صدور لایسنس...');
+        const r = await api('/admin/license/issue', {method:'POST', body: JSON.stringify(body)});
+        log(JSON.stringify(r.data).slice(0,200), r.status===201?'ok':'error');
+    } catch(e){ log(e.message, 'error'); }
+}
+
+async function seedAccount(){
+    try {
+        const body = {
+            bank_id: document.getElementById('seedId').value,
+            amount: parseInt(document.getElementById('seedAmt').value)
+        };
+        const r = await api('/account/seed', {method:'POST', body: JSON.stringify(body)});
+    } catch(e){ log(e.message, 'error'); }
+}
+
+async function getSession(){
+    if(state.session) return state.session;
+    const r = await api('/signing/session', {method:'POST'});
+    if(r.status === 200 && r.data.session_token){
+        state.session = r.data.session_token;
+        log('Session دریافت شد: ' + state.session.slice(0,16) + '...', 'ok');
+        return state.session;
+    }
+    log('خطا در session: ' + JSON.stringify(r.data), 'error');
+}
+
+async function sendTx(){
+    try {
+        const tok = await getSession();
+        if(!tok) return;
+            from: document.getElementById('txFrom').value,
+            to: document.getElementById('txTo').value,
+            amount: parseFloat(document.getElementById('txAmount').value),
+            type: 'transfer'
+        log('ارسال تراکنش...');
+        const start = performance.now();
+        const dur = (performance.now() - start).toFixed(0);
+        state.session = null;
+        log(`تراکنش در ${dur}ms — ${JSON.stringify(r.data).slice(0,150)}`, r.status===201?'ok':'error');
+}
+
+async function sendBatch(){
+    try {
+        const count = parseInt(document.getElementById('batchCount').value);
+        const amount = parseFloat(document.getElementById('batchAmount').value);
+        if(!tok) return;
+        const from = document.getElementById('txFrom').value;
+        const txs = [];
+        for(let i=1;i<=count;i++) txs.push({from, to:`batch-${i}`, amount, type:'transfer'});
+        const start = performance.now();
+        const dur = (performance.now() - start).toFixed(0);
+        log(`Batch در ${dur}ms | TPS: ${tps} | ${JSON.stringify(r.data).slice(0,120)}`, r.status===201?'ok':'error');
+}
+
+async function refreshChain(){
+    try {
+        const r = await api('/chain/stats');
+        document.getElementById('chainData').innerHTML = '<pre style="font-size:12px;color:var(--muted);direction:ltr">' + JSON.stringify(r.data, null, 2) + '</pre>';
+        log('Chain stats دریافت شد', 'ok');
+    } catch(e){ log(e.message, 'error'); }
+}
+
+async function flushChain(){
+    try {
+        const r = await api('/chain/flush', {method:'POST'});
+        log('Flush: ' + JSON.stringify(r.data), r.status===200?'ok':'error');
+        setTimeout(refreshChain, 1000);
+    } catch(e){ log(e.message, 'error'); }
+}
+
+log('WebApp آماده است. اولین کار: اتصال به سرور.', 'info');
+</body>
+</html>
+HTMLEOF
+
+echo "✅ ساخته شد: ~/Desktop/webapp-live.html"
+ls -la ~/Desktop/webapp-live.html
