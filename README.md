@@ -1,116 +1,67 @@
-# Horizon Core — Security Assessment
+# Horizon Core — Security Assessment Package
 
-**Independent security & performance evaluation package.**
+Version: 3.0.1
+Date: October 2026
 
-This package allows banks, exchanges, and auditors to independently verify Horizon Core's security and performance claims.
+Reproducible security & performance evaluation for
+Horizon Core private blockchain.
 
----
+## What's New in v3.0.1
+
+- Unified Blockchain: License + TX + Audit on single chain
+- Adaptive Batcher: async batching (100K TX per request)
+- Block ECDSA P-256 signing on every block
+- Real Shamir Secret Sharing (GF(2^8))
+- Air-Gap enforcement on outbound HTTP
+- Fail-closed auth (no ADMIN_TOKEN = no start)
+- Dual Control + Signing Session enforced on /tx
+- FIPS 186-5 alignment (186-4 withdrawn Feb 2024)
 
 ## Quick Start
-
-### Linux / macOS
 
 git clone https://github.com/beaconchain-horizon/horizon-security-assessment.git
 cd horizon-security-assessment
 ./run.sh
 
-### Windows
-
-1. Download ZIP
-2. Extract
-3. Double-click `run.bat`
-
----
+Windows: Download ZIP -> run.bat
 
 ## What This Tests
 
-| # | Test | What It Proves |
-|---|------|----------------|
-| 1 | Health Check | Server is online |
-| 2 | TPS Benchmark | 200,000 transactions signed & verified |
-| 3 | Rate Limiting | 50 req/s limit enforced |
-| 4 | Replay Protection | Invalid signatures rejected |
-| 5 | Dual Control | Two-person approval system |
-| 6 | Signing Session | One-time tokens with 5-min TTL |
-| 7 | Integrity Check | Zero tampering (tamper_count=0) |
-| 8 | Auto-Lock | Key auto-locks after inactivity |
+Security:
+- 16 attack vectors (SQLi, XSS, CMDi, SSRF, Replay, JWT)
+- Block signature verification
+- Dual Control flow
+- Signing Session enforcement
+- Air-Gap mode
 
----
+Performance:
+- TPS benchmark (up to 500K readings)
+- Latency measurement
+- Block creation rate
 
-## Verified Results (Reference Run)
+## Architecture
 
-| Metric | Value |
-|--------|-------|
-| **Peak TPS** | 20,000 – 31,000 |
-| **Errors** | 0 |
-| **Tampering** | 0 |
-| **ECDSA Sign Time** | < 1 ms |
-| **Latency** | ~6 ms |
+Unified Blockchain:
 
-**Note:** TPS depends on your CPU. On Intel i7-1185G7: 20K–31K.
+  Block 0: Genesis (owner ECDSA key)
+  Block N: License issue / renew / revoke
+  Block N: Transaction batch
+  Block N: Audit events
 
----
+Each block:
+  - ECDSA P-256 signed
+  - Merkle root of txs
+  - Chain-linked (prev_hash)
 
-## Security Layers Tested
+## Docs
 
-### Layer 1 — DoS Protection
-- Rate Limiting (50 req/s, capacity 100)
-- Connection Limit (500 concurrent)
-- Read/Write Timeout (30 s)
-- Idle Timeout (60 s)
-- Max Header Bytes (1 MB)
-
-### Layer 2 — Replay & Intrusion
-- Nonce (unique per reading)
-- Timestamp window (−300 s to +120 s)
-- SSRF Protection (39/40 vectors blocked)
-- Input Validation
-- CORS Whitelist
-
-### Layer 3 — Key Protection
-- ECDSA P-256 (FIPS 186-5)
-- Key Rotation (90 days)
-- Auto-Lock (30 min inactivity)
-- Manual Lock endpoint
-- Dual Control (two-person approval)
-- Signing Session (one-time tokens)
-- Audit Trail (every signature logged)
-
-### Layer 4 — Supply Chain
-- Dependabot (Go, Docker, Actions)
-- govulncheck + gosec
-- Zero known vulnerabilities
-
-### Layer 5 — Air-Gap
-- Full offline operation
-- In-memory DB (`:memory:`)
-- Zero outbound in isolated mode
-
----
-
-## Files
-
-- `bin/` — compiled binaries (switch, sensortool, tpsbench)
-- `config/chain.json` — chain configuration
-- `run.sh` — Linux/macOS launcher
-- `run.bat` — Windows launcher
-- `EVIDENCE.md` — reference run logs
-- `LICENSE` — MIT
-
----
-
-## No Source Code
-
-This package contains **only compiled binaries**. The source code is private and available under NDA for qualified partners.
-
----
+- SECURITY.md
+- CHANGELOG.md
+- EVIDENCE.md
+- LICENSE
+- LICENSE_FORMAT.md
 
 ## Contact
 
-- **GitHub:** https://github.com/beaconchain-horizon
-- **Benchmark:** https://github.com/beaconchain-horizon/horizon-benchmark
-- **Air-Gap Demo:** https://github.com/beaconchain-horizon/horizon-airgap-demo
-
----
-
-**© 2026 Horizon Core — MIT License**
+GitHub: @beaconchain-horizon
+Email: gamma.mahdii@gmail.com
