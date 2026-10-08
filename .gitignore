@@ -1,4 +1,3 @@
-# Local secrets
 config.local.js
 *.local.js
 .env
@@ -6,23 +5,12 @@ config.local.js
 secrets/
 *.key
 *.pem
-
-# System
 .DS_Store
 Thumbs.db
 desktop.ini
-
-# Logs
 *.log
-npm-debug.log*
-
-# Editors
 .vscode/
 .idea/
-*.swp
-*~
-
-# Build artifacts
 node_modules/
 dist/
 build/
