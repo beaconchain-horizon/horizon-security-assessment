@@ -1,4 +1,4 @@
-════ Horizon 192 Attack Vectors Fri Oct  2 18:58:10 IST 2026 ════
+════ Horizon 192 Attack Vectors Fri Oct  2 20:01:48 IST 2026 ════
 
 ▶ [1/12] SQL Injection (25)
   PASS [1] SQLi: ' OR '1'='1 → blocked

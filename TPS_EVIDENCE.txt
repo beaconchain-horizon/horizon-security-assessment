@@ -1,26 +1,26 @@
-════ Horizon TPS Benchmark Fri Oct  2 19:53:59 IST 2026 ════
+════ Horizon TPS Benchmark Sat Oct  3 21:27:24 IST 2026 ════
 CPU: 8 cores
 
 ── Warmup 10K (n=10000) ──
-  Duration: 157ms
-  TPS:      63694
+  Duration: 270ms
+  TPS:      37037
   Response: {"chain":"batched:10000","failed":0,"processed":10000}
 
 ── Standard 50K (n=50000) ──
-  Duration: 307ms
-  TPS:      162866
+  Duration: 495ms
+  TPS:      101010
   Response: {"chain":"batched:50000","failed":0,"processed":50000}
 
 ── High 100K (n=100000) ──
-  Duration: 408ms
-  TPS:      245098
+  Duration: 626ms
+  TPS:      159744
   Response: {"chain":"batched:100000","failed":0,"processed":100000}
 
 ── Stress 100K (n=100000) ──
-  Duration: 417ms
-  TPS:      239808
+  Duration: 754ms
+  TPS:      132625
   Response: {"chain":"batched:100000","failed":0,"processed":100000}
 
 ── Chain Stats ──
-{"interval_ms":200,"max_size":5000,"queued":0,"total_blocks":20,"total_flushed":11302,"total_submitted":260000,"workers":8}
-Blocks created: 21
+{"interval_ms":200,"max_size":5000,"queued":0,"total_blocks":33,"total_flushed":15763,"total_submitted":260000,"workers":8}
+Blocks created: 35

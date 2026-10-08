@@ -1,21 +1,28 @@
-test-keys/
-*.db
-*.db-shm
-*.db-wal
-switch.log
-*.log
-.DS_Store
-Thumbs.db
-*.bak
+# Local secrets
 config.local.js
 *.local.js
 .env
 .env.*
+secrets/
 *.key
 *.pem
-customers.json
-*.bak-*
-*.bak2.*
-*.backup-*
-*.old
-*.tmp
+
+# System
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs
+*.log
+npm-debug.log*
+
+# Editors
+.vscode/
+.idea/
+*.swp
+*~
+
+# Build artifacts
+node_modules/
+dist/
+build/
