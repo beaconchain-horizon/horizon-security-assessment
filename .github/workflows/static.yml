@@ -1,0 +1,135 @@
+# ══════════════════════════════════════════════════════════════
+#  Horizon Security Assessment — GitHub Pages Deployment
+#  Deploys static content to GitHub Pages automatically on push
+# ══════════════════════════════════════════════════════════════
+
+name: 🌐 Deploy to GitHub Pages
+
+# ─── Triggers ──────────────────────────────────────────────────
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - '**.md'
+      - '.gitignore'
+      - 'LICENSE'
+      - 'docs/**'
+  workflow_dispatch:
+    inputs:
+      reason:
+        description: 'دلیل اجرای دستی'
+        required: false
+        default: 'Manual trigger'
+
+# ─── Permissions ───────────────────────────────────────────────
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# ─── Concurrency ───────────────────────────────────────────────
+concurrency:
+  group: pages-${{ github.ref }}
+  cancel-in-progress: true
+
+# ─── Jobs ──────────────────────────────────────────────────────
+jobs:
+  # ─────────────────────────────────────────────────────────────
+  # Job 1: Build — اعتبارسنجی و آماده‌سازی
+  # ─────────────────────────────────────────────────────────────
+  build:
+    name: 🔨 Build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: 🔍 Validate HTML files
+        run: |
+          echo "▶ بررسی فایل‌های HTML…"
+          MISSING=0
+          for f in index.html store.html monitor.html offline-license.html demo.html; do
+            if [ -f "$f" ]; then
+              SIZE=$(stat -c%s "$f")
+              echo "  ✅ $f ($SIZE bytes)"
+            else
+              echo "  ⚠️  $f یافت نشد"
+              MISSING=$((MISSING + 1))
+            fi
+          done
+          echo ""
+          echo "📊 مجموع فایل‌های HTML: $(ls -1 *.html 2>/dev/null | wc -l)"
+          echo "📊 فایل‌های گمشده: $MISSING"
+
+      - name: 🛡️ Security check — منع فایل‌های حساس
+        run: |
+          echo "▶ بررسی فایل‌های حساس…"
+          FORBIDDEN="config.local.js .env secrets.json id_rsa id_ed25519"
+          FOUND=0
+          for f in $FORBIDDEN; do
+            if [ -f "$f" ]; then
+              echo "  ❌ فایل حساس یافت شد: $f"
+              FOUND=$((FOUND + 1))
+            fi
+          done
+          if [ "$FOUND" -gt 0 ]; then
+            echo ""
+            echo "🚨 خطا: فایل‌های حساس نباید در مخزن باشند!"
+            exit 1
+          fi
+          echo "  ✅ هیچ فایل حساسی یافت نشد"
+
+      - name: ⚙️ Setup Pages
+        uses: actions/configure-pages@v5
+        with:
+          enablement: true
+
+      - name: 📦 Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: '.'
+          retention-days: 1
+
+  # ─────────────────────────────────────────────────────────────
+  # Job 2: Deploy — انتشار روی GitHub Pages
+  # ─────────────────────────────────────────────────────────────
+  deploy:
+    name: 🚀 Deploy
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: 🌐 Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+      - name: 📊 Deployment summary
+        run: |
+          echo "## 🎉 استقرار موفق" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| مورد | مقدار |" >> $GITHUB_STEP_SUMMARY
+          echo "|---|---|" >> $GITHUB_STEP_SUMMARY
+          echo "| 🌐 URL | ${{ steps.deployment.outputs.page_url }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| 📦 مخزن | ${{ github.repository }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| 🔀 شاخه | ${{ github.ref_name }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| 👤 عامل | ${{ github.actor }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| 🕐 زمان | $(date -u '+%Y-%m-%d %H:%M:%S UTC') |" >> $GITHUB_STEP_SUMMARY
+          echo "| 🔖 commit | \`${{ github.sha }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 🔗 لینک‌های صفحات" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          BASE="${{ steps.deployment.outputs.page_url }}"
+          echo "- [🏠 ریشه](${BASE})" >> $GITHUB_STEP_SUMMARY
+          echo "- [🛍️ فروشگاه](${BASE}store.html)" >> $GITHUB_STEP_SUMMARY
+          echo "- [🎛️ مانیتور SOC](${BASE}monitor.html)" >> $GITHUB_STEP_SUMMARY
+          echo "- [🔑 لایسنس آفلاین](${BASE}offline-license.html)" >> $GITHUB_STEP_SUMMARY
+          echo "- [📊 دمو](${BASE}demo.html)" >> $GITHUB_STEP_SUMMARY
