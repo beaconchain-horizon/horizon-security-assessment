@@ -302,5 +302,55 @@ $('dlBtn').addEventListener('click', function() {
   showStatus('genStatus', 'ok', '💾 فایل دانلود شد: ' + licId + '.lic');
 });
 </script>
+
+<div class="sec">
+  <h2><span class="badge">3.5</span> Verify on Switch</h2>
+  <button id="verifySwitchBtn" class="btn green" type="button">Verify on Switch (v1.4)</button>
+  <div id="verifySwitchStatus" class="status"></div>
+</div>
+
+<script>
+document.getElementById('verifySwitchBtn').addEventListener('click', async function() {
+  var el = document.getElementById('verifySwitchStatus');
+  var rEl = document.getElementById('result');
+  if (!rEl || !rEl.textContent || rEl.textContent.trim() === '') {
+    el.className = 'status err';
+    el.textContent = 'Generate a license first';
+    return;
+  }
+  var j;
+  try { j = JSON.parse(rEl.textContent); } catch (e) {
+    el.className = 'status err';
+    el.textContent = 'Cannot parse result: ' + e.message;
+    return;
+  }
+  var expDate = new Date(j.expires_at * 1000).toISOString().replace(/\.\d{3}Z$/, 'Z');
+  var data = j.license_id + '|' + j.product_id + '|' + j.user_id + '|' + j.volume + '|' + (j.merkle_root || '') + '|' + j.status + '|' + expDate;
+  var payload = {license_id: j.license_id, user_id: j.user_id, signature: j.signature, data: data};
+
+  el.className = 'status info';
+  el.textContent = 'Sending to Switch...';
+
+  try {
+    var r = await fetch('http://localhost:8081/api/v1/license/check', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(payload)
+    });
+    var res = await r.json();
+    if (res.valid && res.verified) {
+      el.className = 'status ok';
+      el.textContent = 'Switch ACCEPTED - valid=true verified=true';
+    } else {
+      el.className = 'status err';
+      el.textContent = 'Switch REJECTED - ' + (res.error || JSON.stringify(res));
+    }
+  } catch (e) {
+    el.className = 'status err';
+    el.textContent = 'Cannot reach Switch on localhost:8081 - ' + e.message;
+  }
+});
+</script>
+
 </body>
 </html>
