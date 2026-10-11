@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Horizon v1.4 — Deployment Positioning</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:linear-gradient(135deg,#0a1628,#1a2942);color:#eef2ff;font-family:Tahoma,Vazirmatn,sans-serif;line-height:1.9;padding:0 0 60px}
+.banner{position:sticky;top:0;z-index:99;background:linear-gradient(90deg,#0a1628,#1a2942);border-bottom:1px solid #4f9eff;padding:10px 20px;text-align:center;font-size:13px}
+.banner a{color:#4ade80;text-decoration:none;font-weight:700;margin:0 10px}
+.banner a.blue{color:#4f9eff}
+.banner a.gray{color:#8fa2dc;font-weight:400}
+.container{max-width:900px;margin:30px auto;background:rgba(20,32,55,.92);border:1px solid rgba(79,158,255,.3);border-radius:16px;padding:40px 50px}
+h1{color:#4f9eff;font-size:1.8rem;margin:20px 0 15px;border-bottom:2px solid rgba(79,158,255,.3);padding-bottom:10px}
+h2{color:#c084fc;font-size:1.3rem;margin:28px 0 12px;padding-right:12px;border-right:3px solid #c084fc}
+h3{color:#a78bfa;font-size:1.05rem;margin:20px 0 10px}
+p{margin:10px 0;color:#cbd5e1}
+strong{color:#eef2ff}
+code{background:rgba(79,158,255,.15);padding:2px 7px;border-radius:5px;font-family:Consolas,monospace;font-size:.85em;color:#c084fc;direction:ltr;display:inline-block}
+pre{background:rgba(5,15,30,.85);border:1px solid rgba(79,158,255,.2);border-radius:10px;padding:18px;overflow-x:auto;margin:14px 0;direction:ltr;text-align:left}
+pre code{background:none;padding:0;color:#8fa2dc;font-size:.82em;line-height:1.7;display:block}
+table{width:100%;border-collapse:collapse;margin:16px 0;background:rgba(10,22,40,.5);border-radius:10px;overflow:hidden}
+th,td{padding:11px 14px;text-align:right;border-bottom:1px solid rgba(79,158,255,.15)}
+th{background:rgba(79,158,255,.12);color:#4f9eff;font-weight:700;font-size:.88em}
+td{font-size:.86em}
+tr:last-child td{border-bottom:none}
+hr{border:none;height:1px;background:linear-gradient(90deg,transparent,rgba(79,158,255,.5),transparent);margin:32px 0}
+blockquote{background:rgba(250,204,21,.1);border-right:3px solid #facc15;color:#facc15;padding:12px 18px;margin:14px 0;border-radius:8px;font-size:.9em}
+ul,ol{margin:10px 24px;color:#cbd5e1}
+li{margin:5px 0}
+a{color:#4f9eff;text-decoration:none;border-bottom:1px dotted rgba(79,158,255,.4)}
+a:hover{color:#4ade80;border-bottom-color:#4ade80}
+.footer{text-align:center;color:#8fa2dc;font-size:.8em;margin-top:40px;padding-top:20px;border-top:1px solid rgba(79,158,255,.15)}
+@media(max-width:640px){.container{padding:24px 20px;margin:15px}h1{font-size:1.4rem}h2{font-size:1.1rem}}
+</style>
+</head>
+<body>
+
+<div class="banner">
+  <span style="background:linear-gradient(135deg,#4f9eff,#c084fc);color:#fff;padding:2px 10px;border-radius:12px;font-weight:700;font-size:11px">v1.4</span>
+  <a href="offline-license.html">🔑 Offline Signer</a>
+  <a href="https://github.com/beaconchain-horizon/horizon-core" class="blue">GitHub</a>
+  <a href="https://github.com/beaconchain-horizon/horizon-core/blob/main/docs/CRYPTO-CONTRACT.md" class="gray">Crypto Contract</a>
+  <a href="index.html" class="gray">Home</a>
+</div>
+
+<div class="container">
+<h1>Horizon Core v1.4 — Deployment Positioning</h1>
+<p><strong>Date</strong>: 2026-10-11</p>
+<p><strong>Audience</strong>: Sarcheshmeh (industrial) · Judiciary IT / Khorasan (regulatory)</p>
+<hr>
+<h2>خلاصه‌ی مدیریتی</h2>
+<p>Horizon Core یک <strong>لایه‌ی اثبات‌پذیری و حاکمیت</strong> است که روی زیرساخت موجود نصب می‌شود.</p>
+<p>جایگزین Core Banking نمی‌شود، جایگزین SCADA نمی‌شود. کاری که می‌کند:</p>
+<ol><li><strong>امضای دیجیتال هر عملیات</strong> (secp256k1)</li></ol>
+<ol><li><strong>زنجیر تغییرناپذیر شواهد</strong> (Merkle RFC 6962)</li></ol>
+<ol><li><strong>کنترل لایسنس و سیاست</strong> (Policy Enforcement Gateway)</li></ol>
+<ol><li><strong>کار در حالت air-gap</strong></li></ol>
+<p>هدف: وقتی رگولاتور یا حسابرس می‌پرسد «این عدد از کجا آمده؟»،</p>
+<p>شما یک proof رمزنگاری‌شده نشان می‌دهید، نه یک log قابل ویرایش.</p>
+<hr>
+<h2>بخش الف — جایگاه در لایه‌های بانکداری</h2>
+<pre><code>
+L7 │ کانال‌های مشتری   │ اینترنت‌بانک · موبایل · ATM · POS
+L6 │ واسط / API Gateway │ REST · ISO 8583 · SOAP
+L5 │ سوییچ پرداخت       │ RTGS · ACH · شتاب · کارت
+L4 │ Core Banking (CBS) │ حساب · تراکنش · تسویه
+L3 │ Treasury/ریسک      │ نقدینگی · اعتبار · نرخ
+L2 │ انطباق و AML       │ AML · KYC · Fraud · رگولاتور
+L1 │ حسابرسی و شواهد    │ Audit · Evidence · Reporting  ← Horizon
+L0 │ زیرساخت            │ DB · Storage · شبکه · HSM
+</code></pre>
+<h3>Horizon کجا می‌نشیند؟</h3>
+<p><strong>بین L1 و L2</strong> — لایه‌ی شواهد و حاکمیت، با hooks به L5 و L4.</p>
+<table>
+<thead><tr><th>تماس با لایه</th><th>نحوه‌ی اتصال</th><th>جهت</th></tr></thead><tbody>
+<tr><td>L5 (سوییچ پرداخت)</td><td>امضای هر پیام ISO/RTGS</td><td>outbound</td></tr>
+<tr><td>L4 (CBS)</td><td>anchor هر تراکنش تسویه</td><td>inbound</td></tr>
+<tr><td>L3 (Treasury)</td><td>register گزارش‌های روزانه</td><td>inbound</td></tr>
+<tr><td>L2 (AML/Fraud)</td><td>ارائه proof به رگولاتور</td><td>outbound</td></tr>
+<tr><td>L1 (Audit)</td><td>ذخیره‌ی زنجیر تغییرناپذیر</td><td>بومی</td></tr>
+<tr><td>L0 (زیرساخت)</td><td>مستقل — DB + Storage موجود</td><td>passive</td></tr>
+</tbody></table>
+<h3>چه چیزی را حل می‌کند؟</h3>
+<ol><li>اثبات اصالت تراکنش به رگولاتور</li></ol>
+<ol><li>جلوگیری از دستکاری log توسط insider</li></ol>
+<ol><li>Dual Control رمزنگاری‌شده</li></ol>
+<ol><li>گره‌خوردگی لایسنس به سخت‌افزار</li></ol>
+<h3>چه چیزی نیست؟</h3>
+<ul><li>❌ جایگزین Core Banking نیست</li></ul>
+<ul><li>❌ جایگزین سوییچ پرداخت نیست</li></ul>
+<ul><li>❌ اجماع توزیع‌شده ندارد</li></ul>
+<ul><li>❌ HSM سخت‌افزاری ندارد (نسخه‌ی بعدی)</li></ul>
+<hr>
+<h2>بخش ب — جایگاه در لایه‌های صنعت (Purdue ISA-95)</h2>
+<pre><code>
+L5 │ Cloud / Enterprise SaaS │ BI · ERP ابری · گزارش رگولاتور
+L4 │ Enterprise (IT)         │ ERP · MES · Historian مرکزی
+L3 │ Operations (OT)         │ Historian · MES · Batch
+L2 │ Supervision             │ SCADA · HMI · Alarm
+L2.5│ ← Horizon (Evidence)  │ anchor · Merkle · air-gap
+L1 │ Control                 │ PLC · RTU · DCS
+L0 │ Field                   │ سنسور · عملگر · فیلدباس
+</code></pre>
+<h3>Horizon کجا می‌نشیند؟</h3>
+<p><strong>L2.5</strong> — لایه‌ی اثبات داده‌ی صنعتی.</p>
+<table>
+<thead><tr><th>تماس با لایه</th><th>نحوه‌ی اتصال</th><th>جهت</th></tr></thead><tbody>
+<tr><td>L2 (SCADA/HMI)</td><td>دریافت خوانش (OPC-UA · Modbus)</td><td>inbound</td></tr>
+<tr><td>L2.5 (این سیستم)</td><td>anchor هر خوانش</td><td>بومی</td></tr>
+<tr><td>L3 (Historian)</td><td>ارسال hash</td><td>outbound</td></tr>
+<tr><td>L3 (MES)</td><td>اتصال به batch records</td><td>outbound</td></tr>
+<tr><td>L4 (ERP)</td><td>گزارش دوره‌ای</td><td>outbound</td></tr>
+<tr><td>Air-Gap</td><td>جداسازی کامل</td><td>بومی</td></tr>
+</tbody></table>
+<h3>چه چیزی را حل می‌کند؟</h3>
+<ol><li>اثبات اصالت داده‌ی SCADA به رگولاتور</li></ol>
+<ol><li>جلوگیری از دستکاری داده‌ی تاریخی</li></ol>
+<ol><li>کار در مناطق دورافتاده بدون اینترنت</li></ol>
+<ol><li>پاسخ رمزنگاری به «این عدد از کجا آمده؟»</li></ol>
+<h3>مثال سرچشمه</h3>
+<table>
+<thead><tr><th>نیاز</th><th>راه‌حل Horizon</th></tr></thead><tbody>
+<tr><td>ثبت فشار/دما/جریان</td><td>anchor هر ۳۰ ثانیه</td></tr>
+<tr><td>اثبات به سازمان محیط زیست</td><td>Merkle proof</td></tr>
+<tr><td>جداسازی از IT</td><td>air-gap mode</td></tr>
+<tr><td>حسابرسی</td><td>زنجیر تغییرناپذیر</td></tr>
+</tbody></table>
+<hr>
+<h2>بخش ج — وضعیت امنیتی</h2>
+<h3>تست‌شده و کار می‌کند</h3>
+<table>
+<thead><tr><th>قابلیت</th><th>اثبات</th><th>تست</th></tr></thead><tbody>
+<tr><td>امضای secp256k1</td><td>۱۲۸ hex</td><td>✅ crypto/secp256k1_test.go</td></tr>
+<tr><td>فرمت R</td><td></td><td>S 64-byte</td><td>بدون DER/P-256</td><td>✅ reject tests</td></tr>
+<tr><td>RFC 6979 deterministic</td><td>دو امضا یکسان</td><td>✅ TestSign_IsDeterministic</td></tr>
+<tr><td>rejection تغییر بایت امضا</td><td>tamper → reject</td><td>✅ TestTamper_*</td></tr>
+<tr><td>rejection تغییر payload</td><td>tamper → reject</td><td>✅ TestTamper_RejectsPayloadChange</td></tr>
+<tr><td>HWID binding</td><td>mismatch → reject</td><td>✅ TestHWID_Policy</td></tr>
+<tr><td>expiry</td><td>خارج از بازه → reject</td><td>✅ TestExpiry_Boundaries</td></tr>
+<tr><td>Merkle inclusion</td><td>tamper leaf → reject</td><td>✅ TestProof_RejectsTamperedLeaf</td></tr>
+<tr><td>کار بدون اینترنت</td><td>امضا USB + verify</td><td>✅ E2E</td></tr>
+</tbody></table>
+<h3>Roadmap (صادقانه)</h3>
+<table>
+<thead><tr><th>قابلیت</th><th>وضعیت</th><th>ETA</th></tr></thead><tbody>
+<tr><td>Multi-node consensus</td><td>طراحی</td><td>Q1 2027</td></tr>
+<tr><td>HSM</td><td>انتخاب vendor</td><td>Q4 2026</td></tr>
+<tr><td>ISO 27001</td><td>مستندسازی</td><td>Q2 2027</td></tr>
+<tr><td>FIPS 186-5</td><td><strong>درخواست نشده</strong></td><td>Q3 2027</td></tr>
+</tbody></table>
+<blockquote><strong>نکته برای دادگستری:</strong> ادعای FIPS نداریم. secp256k1 استاندارد SEC 2 است</blockquote>
+<blockquote>(Bitcoin/Ethereum) ولی تحت FIPS 186-5 تأیید نشده.</blockquote>
+<h3>جایگاه امنیتی — چه چیزی محافظت می‌شود</h3>
+<table>
+<thead><tr><th>تهدید</th><th>محافظت</th><th>لایه</th></tr></thead><tbody>
+<tr><td>دستکاری log</td><td>زنجیر تغییرناپذیر</td><td>L1</td></tr>
+<tr><td>جعل امضا</td><td>secp256k1</td><td>L1</td></tr>
+<tr><td>replay</td><td>nonce + timestamp</td><td>L2</td></tr>
+<tr><td>SSRF</td><td>validation ۳۹/۴۰</td><td>L2</td></tr>
+<tr><td>DoS</td><td>rate + connection limit</td><td>L1</td></tr>
+<tr><td>دسترسی غیرمجاز API</td><td>fail-closed</td><td>L3</td></tr>
+<tr><td>سرقت کلید خصوصی</td><td>USB offline</td><td>L3</td></tr>
+<tr><td>نصب سخت‌افزار اشتباه</td><td>HWID binding</td><td>L3</td></tr>
+<tr><td>نشت وابستگی</td><td>Dependabot + CodeQL</td><td>L4</td></tr>
+<tr><td>دسترسی خارجی</td><td>air-gap</td><td>L5</td></tr>
+</tbody></table>
+<hr>
+<h2>پیشنهاد ارائه</h2>
+<h3>برای سرچشمه (۱۵ دقیقه)</h3>
+<ol><li>مسئله: چه کسی ثابت می‌کند داده دست‌کاری نشده؟</li></ol>
+<ol><li>راه‌حل: لایه‌ی اثبات بین SCADA و Historian</li></ol>
+<ol><li>معماری: درج در L2.5</li></ol>
+<ol><li>دمو: anchor یک خوانش + Merkle proof</li></ol>
+<ol><li>air-gap روی شبکه‌ی جدا</li></ol>
+<ol><li>نقشه: HSM در Q4 2026</li></ol>
+<h3>برای دادگستری (۲۰ دقیقه)</h3>
+<ol><li>هدف: سیستم اثبات‌پذیر</li></ol>
+<ol><li>جایگاه در L1-L2 (بانک) و L2.5 (صنعت)</li></ol>
+<ol><li>آنچه اثبات می‌شود</li></ol>
+<ol><li>آنچه ادعا نمی‌شود (FIPS, HSM, consensus)</li></ol>
+<ol><li>زنجیره‌ی اعتماد: Authority → Switch → Auditor</li></ol>
+<ol><li>دمو زنده</li></ol>
+<ol><li>الزامات نصب</li></ol>
+<h3>سؤال‌های احتمالی</h3>
+<p><strong>Q: تفاوت با بلاکچین عمومی؟</strong></p>
+<p>A: عمومی نیستیم — لایه‌ی اثبات درون سازمان.</p>
+<p><strong>Q: تفاوت با HSM؟</strong></p>
+<p>A: HSM زیرساخت (L0) است — از آن استفاده خواهیم کرد.</p>
+<p><strong>Q: چه چیزی جلوی دستکاری خود Horizon را می‌گیرد؟</strong></p>
+<p>A: هر بلاک با کلید Authority امضا می‌شود. کلید روی USB آفلاین است.</p>
+<p><strong>Q: اگر USB گم شود؟</strong></p>
+<p>A: کلید قابل rotate است، امضاهای قبلی معتبر می‌مانند. Shamir split می‌شود.</p>
+<p><strong>Q: با CBS فعلی تداخل دارد؟</strong></p>
+<p>A: هیچ. فقط خواندن. اتصال read-only.</p>
+<hr>
+<h2>لینک‌های رسمی</h2>
+<ul><li>مخزن: https://github.com/beaconchain-horizon/horizon-core</li></ul>
+<ul><li>قرارداد رمزنگاری: https://github.com/beaconchain-horizon/horizon-core/blob/main/docs/CRYPTO-CONTRACT.md</li></ul>
+<ul><li>راهنمای دمو: https://github.com/beaconchain-horizon/horizon-core/blob/main/docs/V14-DEMO.md</li></ul>
+<ul><li>ارزیابی امنیتی: https://beaconchain-horizon.github.io/horizon-security-assessment/</li></ul>
+<ul><li>امضا USB: https://beaconchain-horizon.github.io/horizon-security-assessment/offline-license.html</li></ul>
+<hr>
+<p><strong>© 2026 Horizon — Mahdi Amoli Moghaddam</strong></p>
+<div class="footer">© 2026 Horizon Core · <a href="https://github.com/beaconchain-horizon/horizon-core">github.com/beaconchain-horizon/horizon-core</a></div>
+</div>
+
+</body>
+</html>
