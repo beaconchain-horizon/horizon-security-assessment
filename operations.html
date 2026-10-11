@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Horizon v1.4 — عملیات و SLA — Horizon v1.4</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:linear-gradient(135deg,#0a1628,#1a2942);color:#eef2ff;font-family:Tahoma,Vazirmatn,sans-serif;line-height:1.9;padding:0 0 60px}
+.banner{position:sticky;top:0;z-index:99;background:linear-gradient(90deg,#0a1628,#1a2942);border-bottom:1px solid #4f9eff;padding:10px 20px;text-align:center;font-size:13px;overflow-x:auto;white-space:nowrap}
+.banner a{color:#4ade80;text-decoration:none;font-weight:700;margin:0 8px}
+.banner a.blue{color:#4f9eff}
+.banner a.gray{color:#8fa2dc;font-weight:400}
+.container{max-width:900px;margin:30px auto;background:rgba(20,32,55,.92);border:1px solid rgba(79,158,255,.3);border-radius:16px;padding:40px 50px}
+h1{color:#4f9eff;font-size:1.8rem;margin:20px 0 15px;border-bottom:2px solid rgba(79,158,255,.3);padding-bottom:10px}
+h2{color:#c084fc;font-size:1.3rem;margin:28px 0 12px;padding-right:12px;border-right:3px solid #c084fc}
+h3{color:#a78bfa;font-size:1.05rem;margin:20px 0 10px}
+p{margin:10px 0;color:#cbd5e1}
+strong{color:#eef2ff}
+code{background:rgba(79,158,255,.15);padding:2px 7px;border-radius:5px;font-family:Consolas,monospace;font-size:.85em;color:#c084fc;direction:ltr;display:inline-block}
+pre{background:rgba(5,15,30,.85);border:1px solid rgba(79,158,255,.2);border-radius:10px;padding:18px;overflow-x:auto;margin:14px 0;direction:ltr;text-align:left}
+pre code{background:none;padding:0;color:#8fa2dc;font-size:.82em;line-height:1.7;display:block}
+table{width:100%;border-collapse:collapse;margin:16px 0;background:rgba(10,22,40,.5);border-radius:10px;overflow:hidden;display:block;overflow-x:auto}
+th,td{padding:11px 14px;text-align:right;border-bottom:1px solid rgba(79,158,255,.15);white-space:nowrap}
+th{background:rgba(79,158,255,.12);color:#4f9eff;font-weight:700;font-size:.88em}
+td{font-size:.86em}
+tr:last-child td{border-bottom:none}
+hr{border:none;height:1px;background:linear-gradient(90deg,transparent,rgba(79,158,255,.5),transparent);margin:32px 0}
+blockquote{background:rgba(250,204,21,.1);border-right:3px solid #facc15;color:#facc15;padding:12px 18px;margin:14px 0;border-radius:8px;font-size:.9em}
+ul,ol{margin:10px 24px;color:#cbd5e1}
+li{margin:5px 0}
+a{color:#4f9eff;text-decoration:none;border-bottom:1px dotted rgba(79,158,255,.4)}
+a:hover{color:#4ade80;border-bottom-color:#4ade80}
+.footer{text-align:center;color:#8fa2dc;font-size:.8em;margin-top:40px;padding-top:20px;border-top:1px solid rgba(79,158,255,.15)}
+@media(max-width:640px){.container{padding:24px 20px;margin:15px}h1{font-size:1.4rem}h2{font-size:1.1rem}}
+</style>
+</head>
+<body>
+<div class="banner">
+<span style="background:linear-gradient(135deg,#4f9eff,#c084fc);color:#fff;padding:2px 10px;border-radius:12px;font-weight:700;font-size:11px">v1.4</span>
+<a href="positioning.html">جایگاه</a>
+<a href="deployment.html">استقرار</a>
+<a href="operations.html">عملیات</a>
+<a href="compliance.html">انطباق</a>
+<a href="offline-license.html" class="blue">امضا آفلاین</a>
+<a href="index.html" class="gray">صفحه اصلی</a>
+</div>
+<div class="container">
+<h1>Horizon v1.4 — Operations Manual</h1>
+<p><strong>Audience</strong>: Sarcheshmeh IT · Judiciary IT / Khorasan</p>
+<p><strong>Scope</strong>: SLA, backup, disaster recovery, training, support</p>
+<hr>
+<h2>1. Service Level Agreement (SLA)</h2>
+<h3>Availability</h3>
+<table><thead><tr><th>Component</th><th>Target uptime</th><th>Notes</th></tr></thead><tbody>
+<tr><td>Backend API</td><td>99.5% / month</td><td>~3.6h downtime / month allowed</td></tr>
+<tr><td>Switch gateway</td><td>99.5% / month</td><td></td></tr>
+<tr><td>Ledger storage</td><td>99.9% / month</td><td>Postgres or SQLite</td></tr>
+</tbody></table>
+<h3>Response times</h3>
+<table><thead><tr><th>Severity</th><th>Definition</th><th>Response</th><th>Resolution</th></tr></thead><tbody>
+<tr><td>P1 — Critical</td><td>Ledger stopped, licenses rejected</td><td>1h</td><td>4h</td></tr>
+<tr><td>P2 — Major</td><td>Performance degraded &gt;50%</td><td>4h</td><td>24h</td></tr>
+<tr><td>P3 — Minor</td><td>Single feature impaired</td><td>24h</td><td>7d</td></tr>
+<tr><td>P4 — Cosmetic</td><td>UI/typo</td><td>7d</td><td>next release</td></tr>
+</tbody></table>
+<h3>Support channels</h3>
+<ul>
+<li>Email: support@horizon-core (response &lt; 4h business hours)</li>
+<li>Phone: emergency line for P1 only</li>
+<li>On-site: for P1 within 24h if remote fails</li>
+</ul>
+<hr>
+<h2>2. Backup strategy</h2>
+<h3>Online mode (PostgreSQL)</h3>
+<pre><code>
+# Daily full backup
+pg_dump -Fc horizon_db &gt; /backup/horizon-$(date +%Y%m%d).dump
+
+# Continuous WAL archiving for point-in-time recovery
+archive_command = 'cp %p /backup/wal/%f'
+</code></pre>
+<ul>
+<li><strong>RPO</strong> (Recovery Point Objective): 5 minutes</li>
+<li><strong>RTO</strong> (Recovery Time Objective): 1 hour</li>
+</ul>
+<h3>Offline mode (SQLite)</h3>
+<pre><code>
+# Daily snapshot (safe while running)
+sqlite3 /data/horizon.db ".backup '/backup/horizon-$(date +%Y%m%d).db'"
+</code></pre>
+<ul>
+<li><strong>RPO</strong>: 24 hours (or 1 hour with hourly cron)</li>
+<li><strong>RTO</strong>: 15 minutes (copy file back)</li>
+</ul>
+<h3>Both modes</h3>
+<ul>
+<li><strong>Merkle root backup</strong>: publish the daily Merkle root to a separate</li>
+</ul>
+<p>  append-only file <code>/backup/merkle-roots.log</code>. This proves that data</p>
+<p>  existed on a given day even if the DB is lost.</p>
+<ul>
+<li><strong>USB export</strong>: monthly, export the ledger as a signed bundle for</li>
+</ul>
+<p>  off-site storage.</p>
+<hr>
+<h2>3. Disaster recovery</h2>
+<h3>Scenario 1 — Backend crash</h3>
+<ol>
+<li>Systemd restarts it: <code>systemctl restart horizon-api</code></li>
+<li>Ledger resumes from the last block</li>
+<li><strong>Zero data loss</strong> (WAL persistence)</li>
+</ol>
+<h3>Scenario 2 — Disk failure</h3>
+<ol>
+<li>Replace disk</li>
+<li>Restore latest snapshot</li>
+<li>Ledger resumes from snapshot</li>
+<li><strong>Data loss = up to 5 minutes</strong> (from WAL)</li>
+<li>Replay from CBS/SCADA if needed (idempotent)</li>
+</ol>
+<h3>Scenario 3 — Database corruption</h3>
+<ol>
+<li>Stop services</li>
+<li>Restore latest backup</li>
+<li>Verify Merkle root matches the published one</li>
+<li><strong>Data loss = up to 24 hours</strong></li>
+<li>Replay from source if available</li>
+</ol>
+<h3>Scenario 4 — USB key lost</h3>
+<ol>
+<li>Rotate the key: generate new secp256k1 key</li>
+<li>Publish new public key to Switch</li>
+<li>Sign an invalidation record with the new key</li>
+<li><strong>Prior signed blocks remain valid</strong> (they were signed with the old key)</li>
+<li>New blocks signed with the new key</li>
+</ol>
+<h3>Scenario 5 — Complete site loss</h3>
+<ol>
+<li>Restore from off-site USB export</li>
+<li>Rebuild from CBS/SCADA if the source has the full history</li>
+<li><strong>Recovery from cold backup &lt; 4 hours</strong></li>
+</ol>
+<hr>
+<h2>4. Training</h2>
+<h3>Operator training (2 days)</h3>
+<p>Day 1:</p>
+<ul>
+<li>Architecture overview (L1-L2 bank / L2.5 industry)</li>
+<li>Starting/stopping services</li>
+<li>Reading logs</li>
+<li>Health checks</li>
+</ul>
+<p>Day 2:</p>
+<ul>
+<li>License issuance workflow</li>
+<li>USB key handling</li>
+<li>Backup procedures</li>
+<li>Incident response basics</li>
+</ul>
+<h3>Administrator training (3 additional days)</h3>
+<ul>
+<li>Key rotation</li>
+<li>Merkle proof generation for auditors</li>
+<li>Disaster recovery drills</li>
+<li>Configuration tuning</li>
+<li>Security hardening</li>
+</ul>
+<h3>Documentation provided</h3>
+<ul>
+<li>This operations manual (Persian + English)</li>
+<li>Video walkthroughs (10 x 15 min)</li>
+<li>Runbooks for common incidents</li>
+</ul>
+<hr>
+<h2>5. Reporting to regulator</h2>
+<h3>Daily report (JSON + PDF)</h3>
+<pre><code>
+{
+  "date": "2026-10-11",
+  "transactions_anchored": 128472,
+  "merkle_root": "0xabc123...",
+  "block_signature": "0xdef456...",
+  "authority_public_key": "0x...",
+  "chain_height": 9843
+}
+</code></pre>
+<h3>Monthly digest</h3>
+<ul>
+<li>Aggregated stats</li>
+<li>Merkle root history</li>
+<li>Key rotation events (if any)</li>
+<li>Incident log</li>
+</ul>
+<h3>On-demand proof bundle</h3>
+<p>For any single transaction:</p>
+<ul>
+<li>Canonical payload</li>
+<li>Merkle inclusion proof (path)</li>
+<li>Block signature</li>
+<li>Public key</li>
+<li>Verification command</li>
+</ul>
+<p>The regulator can verify this <strong>offline</strong> with <code>cmd/licenseverify</code>.</p>
+<hr>
+<h2>6. Monitoring</h2>
+<h3>Health endpoints</h3>
+<table><thead><tr><th>Endpoint</th><th>Purpose</th></tr></thead><tbody>
+<tr><td><code>GET /health</code></td><td>Liveness</td></tr>
+<tr><td><code>GET /api/v1/health</code></td><td>Full health (DB + ledger)</td></tr>
+<tr><td><code>GET /stats</code></td><td>Metrics</td></tr>
+</tbody></table>
+<h3>Alerts</h3>
+<ul>
+<li>Ledger stopped producing blocks &gt; 5 min → P1</li>
+<li>Signature verification failure rate &gt; 0 → P1</li>
+<li>Disk usage &gt; 85% → P2</li>
+<li>DB replication lag &gt; 60s → P2</li>
+</ul>
+<h3>Log retention</h3>
+<ul>
+<li>Application logs: 90 days</li>
+<li>Audit logs (Merkle roots): forever</li>
+<li>Access logs: 1 year</li>
+</ul>
+<hr>
+<h2>7. Upgrade procedure</h2>
+<ol>
+<li>Download signed release bundle</li>
+<li>Verify signature with the current public key</li>
+<li>Stop services</li>
+<li>Backup DB</li>
+<li>Replace binaries</li>
+<li>Run migrations</li>
+<li>Start services</li>
+<li>Verify health + smoke test</li>
+<li>Rollback plan: keep previous binaries for 7 days</li>
+</ol>
+<hr>
+<h2>8. Costs (indicative)</h2>
+<table><thead><tr><th>Item</th><th>One-time</th><th>Recurring</th></tr></thead><tbody>
+<tr><td>Installation</td><td>included</td><td>—</td></tr>
+<tr><td>Training</td><td>included</td><td>—</td></tr>
+<tr><td>Annual license</td><td>—</td><td>per contract</td></tr>
+<tr><td>Support (business hours)</td><td>—</td><td>included</td></tr>
+<tr><td>Support (24/7)</td><td>—</td><td>optional</td></tr>
+<tr><td>On-site visits</td><td>travel</td><td>per visit</td></tr>
+</tbody></table>
+<hr>
+<p><strong>© 2026 Horizon — Mahdi Amoli Moghaddam</strong></p>
+<div class="footer">© 2026 Horizon Core · <a href="https://github.com/beaconchain-horizon/horizon-core">github.com/beaconchain-horizon/horizon-core</a></div>
+</div>
+</body>
+</html>

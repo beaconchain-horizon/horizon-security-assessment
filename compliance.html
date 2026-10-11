@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Horizon v1.4 — انطباق و استناد قانونی — Horizon v1.4</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:linear-gradient(135deg,#0a1628,#1a2942);color:#eef2ff;font-family:Tahoma,Vazirmatn,sans-serif;line-height:1.9;padding:0 0 60px}
+.banner{position:sticky;top:0;z-index:99;background:linear-gradient(90deg,#0a1628,#1a2942);border-bottom:1px solid #4f9eff;padding:10px 20px;text-align:center;font-size:13px;overflow-x:auto;white-space:nowrap}
+.banner a{color:#4ade80;text-decoration:none;font-weight:700;margin:0 8px}
+.banner a.blue{color:#4f9eff}
+.banner a.gray{color:#8fa2dc;font-weight:400}
+.container{max-width:900px;margin:30px auto;background:rgba(20,32,55,.92);border:1px solid rgba(79,158,255,.3);border-radius:16px;padding:40px 50px}
+h1{color:#4f9eff;font-size:1.8rem;margin:20px 0 15px;border-bottom:2px solid rgba(79,158,255,.3);padding-bottom:10px}
+h2{color:#c084fc;font-size:1.3rem;margin:28px 0 12px;padding-right:12px;border-right:3px solid #c084fc}
+h3{color:#a78bfa;font-size:1.05rem;margin:20px 0 10px}
+p{margin:10px 0;color:#cbd5e1}
+strong{color:#eef2ff}
+code{background:rgba(79,158,255,.15);padding:2px 7px;border-radius:5px;font-family:Consolas,monospace;font-size:.85em;color:#c084fc;direction:ltr;display:inline-block}
+pre{background:rgba(5,15,30,.85);border:1px solid rgba(79,158,255,.2);border-radius:10px;padding:18px;overflow-x:auto;margin:14px 0;direction:ltr;text-align:left}
+pre code{background:none;padding:0;color:#8fa2dc;font-size:.82em;line-height:1.7;display:block}
+table{width:100%;border-collapse:collapse;margin:16px 0;background:rgba(10,22,40,.5);border-radius:10px;overflow:hidden;display:block;overflow-x:auto}
+th,td{padding:11px 14px;text-align:right;border-bottom:1px solid rgba(79,158,255,.15);white-space:nowrap}
+th{background:rgba(79,158,255,.12);color:#4f9eff;font-weight:700;font-size:.88em}
+td{font-size:.86em}
+tr:last-child td{border-bottom:none}
+hr{border:none;height:1px;background:linear-gradient(90deg,transparent,rgba(79,158,255,.5),transparent);margin:32px 0}
+blockquote{background:rgba(250,204,21,.1);border-right:3px solid #facc15;color:#facc15;padding:12px 18px;margin:14px 0;border-radius:8px;font-size:.9em}
+ul,ol{margin:10px 24px;color:#cbd5e1}
+li{margin:5px 0}
+a{color:#4f9eff;text-decoration:none;border-bottom:1px dotted rgba(79,158,255,.4)}
+a:hover{color:#4ade80;border-bottom-color:#4ade80}
+.footer{text-align:center;color:#8fa2dc;font-size:.8em;margin-top:40px;padding-top:20px;border-top:1px solid rgba(79,158,255,.15)}
+@media(max-width:640px){.container{padding:24px 20px;margin:15px}h1{font-size:1.4rem}h2{font-size:1.1rem}}
+</style>
+</head>
+<body>
+<div class="banner">
+<span style="background:linear-gradient(135deg,#4f9eff,#c084fc);color:#fff;padding:2px 10px;border-radius:12px;font-weight:700;font-size:11px">v1.4</span>
+<a href="positioning.html">جایگاه</a>
+<a href="deployment.html">استقرار</a>
+<a href="operations.html">عملیات</a>
+<a href="compliance.html">انطباق</a>
+<a href="offline-license.html" class="blue">امضا آفلاین</a>
+<a href="index.html" class="gray">صفحه اصلی</a>
+</div>
+<div class="container">
+<h1>Horizon v1.4 — Compliance &amp; Legal</h1>
+<p><strong>Audience</strong>: Judiciary / Khorasan · Legal counsel · Regulator</p>
+<p><strong>Scope</strong>: standards, court admissibility, legal responsibility, longevity</p>
+<hr>
+<h2>1. Standards compliance</h2>
+<table><thead><tr><th>Standard</th><th>Status</th><th>Notes</th></tr></thead><tbody>
+<tr><td>RFC 6962 (Merkle)</td><td>✅ Implemented</td><td>Binary + trinary tree</td></tr>
+<tr><td>SEC 2 (secp256k1)</td><td>✅ Implemented</td><td>Curve parameters certified</td></tr>
+<tr><td>RFC 6979 (deterministic ECDSA)</td><td>✅ Implemented</td><td>No randomness</td></tr>
+<tr><td>ISO/IEC 27001</td><td>⏳ Roadmap Q2 2027</td><td>Documentation in progress</td></tr>
+<tr><td>FIPS 186-5</td><td>❌ Not requested</td><td>secp256k1 is outside FIPS scope</td></tr>
+<tr><td>PCI-DSS</td><td>⏳ Roadmap</td><td>Only if handling card data</td></tr>
+<tr><td>SOC 2 Type II</td><td>⏳ Roadmap</td><td>For cloud deployments</td></tr>
+</tbody></table>
+<h3>Why not FIPS?</h3>
+<p>FIPS 186-5 approves P-256, P-384, P-521, and Ed25519. It does <strong>not</strong></p>
+<p>approve secp256k1, the curve used by Bitcoin and Ethereum.</p>
+<p><strong>Trade-off</strong>: We chose secp256k1 for cross-industry compatibility</p>
+<p>(Bitcoin, Ethereum, industry tooling) at the cost of FIPS certification.</p>
+<p>If a specific regulator requires FIPS, we can provide a P-256 build —</p>
+<p>but the two curves are <strong>not</strong> compatible on the same ledger.</p>
+<p><strong>Recommendation</strong>: For deployments in Iran, secp256k1 is the industry</p>
+<p>standard. FIPS is a US NIST standard and is not required locally.</p>
+<hr>
+<h2>2. Court admissibility of audit logs</h2>
+<h3>Can this log be used in court?</h3>
+<p><strong>Yes, if the following conditions are met:</strong></p>
+<ol>
+<li><strong>Chain of custody</strong> — the private key was stored offline (USB) and its</li>
+</ol>
+<p>   history is documented.</p>
+<ol>
+<li><strong>Timestamp proof</strong> — each block signature includes the issue time, and</li>
+</ol>
+<p>   the Merkle root is published daily.</p>
+<ol>
+<li><strong>Verification independence</strong> — any third party can verify using only:</li>
+</ol>
+<p>   - the public key</p>
+<p>   - the ledger file</p>
+<p>   - the Merkle inclusion proof</p>
+<ol>
+<li><strong>No backdating possible</strong> — because signatures are deterministic</li>
+</ol>
+<p>   (RFC 6979) and the Merkle chain links every block to the previous one.</p>
+<h3>What to produce in court</h3>
+<table><thead><tr><th>Item</th><th>Source</th></tr></thead><tbody>
+<tr><td>Ledger copy</td><td><code>horizon.db</code> or Postgres dump</td></tr>
+<tr><td>Public key of Authority</td><td><code>GET /api/v1/authority/public-key</code></td></tr>
+<tr><td>Merkle root log</td><td><code>/backup/merkle-roots.log</code></td></tr>
+<tr><td>Block signatures</td><td>embedded in each block</td></tr>
+<tr><td>Expert verification</td><td><code>cmd/licenseverify</code> output + witness</td></tr>
+</tbody></table>
+<h3>Independent verification by a third party</h3>
+<p>The regulator (or court) receives:</p>
+<ol>
+<li>A signed ledger file</li>
+<li>A public key (published out-of-band)</li>
+<li>A verification tool (<code>cmd/licenseverify</code>, open source)</li>
+</ol>
+<p><strong>They run one command and see if every block verifies.</strong> No trust in us</p>
+<p>required. If any byte was changed after signing, verification fails.</p>
+<hr>
+<h2>3. Legal responsibility</h2>
+<h3>Data ownership</h3>
+<ul>
+<li><strong>All data belongs to the customer</strong> (bank, refinery, regulator).</li>
+<li>Horizon only stores cryptographic proofs derived from that data.</li>
+<li>No data is transmitted outside the customer network by default.</li>
+</ul>
+<h3>Data custody</h3>
+<table><thead><tr><th>Data type</th><th>Where stored</th><th>Who has access</th></tr></thead><tbody>
+<tr><td>License private key</td><td>Customer's USB</td><td>Customer only</td></tr>
+<tr><td>Public key</td><td>Backend + Switch env</td><td>Read-only</td></tr>
+<tr><td>Transaction canonical payload</td><td>Backend DB</td><td>Customer DBA</td></tr>
+<tr><td>Merkle roots</td><td>DB + backup</td><td>Customer DBA</td></tr>
+<tr><td>Signatures</td><td>DB</td><td>Customer DBA</td></tr>
+</tbody></table>
+<h3>Liability boundary</h3>
+<ul>
+<li>Horizon provides the <strong>cryptographic layer</strong>.</li>
+<li>Horizon is <strong>not</strong> responsible for the accuracy of the source data</li>
+</ul>
+<p>  (CBS/SCADA outputs).</p>
+<ul>
+<li>Horizon <strong>is</strong> responsible for the integrity of the signature chain</li>
+</ul>
+<p>  (no tampering possible after signing).</p>
+<h3>Data retention</h3>
+<ul>
+<li>Immutable ledger: <strong>indefinite</strong> (customer's choice)</li>
+<li>Application logs: default 90 days (configurable)</li>
+<li>Backup snapshots: default 5 years (aligned with banking regulations)</li>
+</ul>
+<hr>
+<h2>4. Data longevity</h2>
+<h3>How long can we trust this data?</h3>
+<p>The cryptographic proof remains valid <strong>as long as</strong>:</p>
+<ol>
+<li>The secp256k1 curve is considered secure (no known break)</li>
+<li>SHA-256 is considered secure (no known collision)</li>
+</ol>
+<p><strong>Current expectation</strong>: 20+ years for both.</p>
+<h3>Future-proofing</h3>
+<p>If SHA-256 is ever weakened:</p>
+<ul>
+<li>A migration path exists: re-sign each block with SHA-3-256</li>
+<li>The old proofs remain valid (dual-signed during transition)</li>
+<li>The Merkle chain is preserved</li>
+</ul>
+<p>If secp256k1 is ever broken:</p>
+<ul>
+<li>Historical blocks are dual-signed with a new curve</li>
+<li>A migration record is added to the ledger</li>
+<li>Regulatory bodies are notified</li>
+</ul>
+<h3>Recommended practice</h3>
+<ul>
+<li>Store an <strong>offline paper copy</strong> of the daily Merkle root (or print).</li>
+<li>For legal disputes spanning decades, produce the paper + digital together.</li>
+</ul>
+<hr>
+<h2>5. Attack surface (what has been tested)</h2>
+<table><thead><tr><th>Category</th><th>Vectors</th><th>Status</th></tr></thead><tbody>
+<tr><td>SQL Injection</td><td>30</td><td>✅ blocked</td></tr>
+<tr><td>XSS</td><td>25</td><td>✅ blocked</td></tr>
+<tr><td>Command Injection</td><td>20</td><td>✅ blocked</td></tr>
+<tr><td>Path Traversal</td><td>15</td><td>✅ blocked</td></tr>
+<tr><td>Auth Bypass</td><td>20</td><td>✅ blocked</td></tr>
+<tr><td>JWT Attacks</td><td>10</td><td>✅ blocked</td></tr>
+<tr><td>Header Injection</td><td>15</td><td>✅ blocked</td></tr>
+<tr><td>HTTP Methods</td><td>12</td><td>✅ blocked</td></tr>
+<tr><td>Oversize Payload</td><td>15</td><td>✅ blocked</td></tr>
+<tr><td>SSRF</td><td>10</td><td>✅ blocked</td></tr>
+<tr><td>XXE</td><td>5</td><td>✅ blocked</td></tr>
+<tr><td>Business Logic</td><td>15</td><td>✅ blocked</td></tr>
+<tr><td><strong>Total</strong></td><td><strong>192</strong></td><td><strong>100% blocked</strong></td></tr>
+</tbody></table>
+<p>Plus:</p>
+<ul>
+<li><strong>Tamper tests</strong> (single-byte flip in signature/payload) — all rejected</li>
+<li><strong>Cross-key tests</strong> — signature from another key rejected</li>
+<li><strong>Expiry tests</strong> — out-of-window rejected</li>
+<li><strong>HWID tests</strong> — mismatch rejected</li>
+<li><strong>Merkle tests</strong> — tampered leaf rejected</li>
+</ul>
+<p>All tests run on every push via <code>.github/workflows/v14-ci.yml</code>.</p>
+<hr>
+<h2>6. Compliance documentation</h2>
+<table><thead><tr><th>Document</th><th>Location</th></tr></thead><tbody>
+<tr><td>Crypto contract</td><td><code>docs/CRYPTO-CONTRACT.md</code></td></tr>
+<tr><td>Deployment requirements</td><td><code>docs/DEPLOYMENT-REQUIREMENTS.md</code></td></tr>
+<tr><td>Operations manual</td><td><code>docs/OPERATIONS.md</code></td></tr>
+<tr><td>Positioning (layers)</td><td><code>docs/POSITIONING.md</code></td></tr>
+<tr><td>Authority runbook</td><td><code>docs/V14-AUTHORITY-RUNBOOK.md</code></td></tr>
+<tr><td>Demo guide</td><td><code>docs/V14-DEMO.md</code></td></tr>
+<tr><td>This document</td><td><code>docs/COMPLIANCE.md</code></td></tr>
+</tbody></table>
+<h3>Available on request</h3>
+<ul>
+<li>Full STRIDE threat model</li>
+<li>SBOM (Software Bill of Materials)</li>
+<li>Penetration test report (192 vectors)</li>
+<li>Code audit (external, on request)</li>
+</ul>
+<hr>
+<h2>7. Licensing model</h2>
+<table><thead><tr><th>Type</th><th>Description</th></tr></thead><tbody>
+<tr><td>Annual license</td><td>Per site, per year</td></tr>
+<tr><td>Hardware-bound</td><td>Tied to a specific HWID</td></tr>
+<tr><td>Volume tier</td><td>Based on annual transaction count</td></tr>
+<tr><td>Air-gap add-on</td><td>Separate license for isolated sites</td></tr>
+<tr><td>Enterprise</td><td>Includes source access + custom integration</td></tr>
+</tbody></table>
+<p>Details per contract. See <code>COMMERCIAL-LICENSE.md</code> (on request).</p>
+<hr>
+<p><strong>© 2026 Horizon — Mahdi Amoli Moghaddam</strong></p>
+<div class="footer">© 2026 Horizon Core · <a href="https://github.com/beaconchain-horizon/horizon-core">github.com/beaconchain-horizon/horizon-core</a></div>
+</div>
+</body>
+</html>
