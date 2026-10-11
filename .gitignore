@@ -14,10 +14,3 @@ desktop.ini
 node_modules/
 dist/
 build/
-customers.json
-*.bak-*
-*.bak2.*
-*.backup-*
-*.old
-*.tmp
-offline-license.html.pre-*
