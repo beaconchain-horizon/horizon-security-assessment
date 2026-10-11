@@ -28,6 +28,11 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:#4f9eff}
 .file-label input{display:none}
 .badge{display:inline-block;background:linear-gradient(135deg,#4f9eff,#c084fc);color:#fff;padding:3px 10px;border-radius:20px;font-size:.7rem;font-weight:700;margin-right:5px}
 </style>
+<script type="module">
+import * as secp from "https://cdn.jsdelivr.net/npm/@noble/secp256k1@2.1.0/+esm";
+window.secp = secp;
+window.secpReady = true;
+</script>
 </head>
 <body>
 <div class="cont">
@@ -183,23 +188,15 @@ async function loadKey(content, filename) {
     pkcs8.set(pkcs8Prefix, 0);
     pkcs8.set(rawKey.slice(0, 32), pkcs8Prefix.length);
 
-    privateKey = await crypto.subtle.importKey(
-      'pkcs8', pkcs8,
-      { name: 'ECDSA', namedCurve: 'P-256' },
-      true, ['sign']
-    );
+    if (!window.secpReady) {
+      throw new Error('secp256k1 not loaded yet - wait a second and retry');
+    }
+    privateKey = rawKey.slice(0, 32);
 
     // Export public key
-    var jwk = await crypto.subtle.exportKey('jwk', privateKey);
-    function b64ToBytes(s) {
-      return Uint8Array.from(atob(s.replace(/-/g,'+').replace(/_/g,'/')), function(c){ return c.charCodeAt(0); });
-    }
-    var xb = b64ToBytes(jwk.x);
-    var yb = b64ToBytes(jwk.y);
-    var pub = new Uint8Array(1 + xb.length + yb.length);
-    pub[0] = 0x04;
-    pub.set(xb, 1);
-    pub.set(yb, 1 + xb.length);
+    var pub = window.secp.getPublicKey(privateKey, false); // 65-byte uncompressed
+    var xb = pub.slice(1, 33);
+    var yb = pub.slice(33, 65);
     publicKeyHex = '0x' + Array.from(pub).map(function(b){ return b.toString(16).padStart(2,'0'); }).join('');
 
     $('keyInfo').style.display = 'block';
@@ -256,12 +253,9 @@ $('genBtn').addEventListener('click', async function() {
     var msg = licId + '|' + productId + '|' + userId + '|' + volume + '|' + merkleRoot + '|' + status + '|' + expDate;
 
     var msgBytes = new TextEncoder().encode(msg);
-    var sig = await crypto.subtle.sign(
-      { name: 'ECDSA', hash: 'SHA-256' },
-      privateKey,
-      msgBytes
-    );
-    var sigHex = Array.from(new Uint8Array(sig)).map(function(b){ return b.toString(16).padStart(2,'0'); }).join('');
+    var msgHash = new Uint8Array(await crypto.subtle.digest('SHA-256', msgBytes));
+    var sigBytes = window.secp.sign(msgHash, privateKey).toCompactRawBytes();
+    var sigHex = Array.from(sigBytes).map(function(b){ return b.toString(16).padStart(2,'0'); }).join('');
 
     var license = {
       id: 0,
