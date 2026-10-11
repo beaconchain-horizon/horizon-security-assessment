@@ -30,6 +30,9 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:#4f9eff}
 </style>
 <script type="module">
 import * as secp from "https://cdn.jsdelivr.net/npm/@noble/secp256k1@2.1.0/+esm";
+import { hmac } from "https://cdn.jsdelivr.net/npm/@noble/hashes@1.4.0/hmac/+esm";
+import { sha256 } from "https://cdn.jsdelivr.net/npm/@noble/hashes@1.4.0/sha256/+esm";
+secp.etc.hmacSha256Sync = (k, ...m) => hmac(sha256, k, secp.etc.concatBytes(...m));
 window.secp = secp;
 window.secpReady = true;
 </script>
