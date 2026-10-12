@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Horizon Core v1.4 — Comprehensive Technical Proposal</title>
+<meta name="description" content="Full ecosystem proposal for Horizon Core v1.4 — cryptographic evidence layer for banking and industry.">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:linear-gradient(135deg,#0a1628,#1a2942);color:#eef2ff;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Tahoma,sans-serif;line-height:1.85;padding:0 0 60px;min-height:100vh}
+.container{max-width:1000px;margin:30px auto;background:rgba(20,32,55,.92);border:1px solid rgba(79,158,255,.3);border-radius:16px;padding:50px 60px;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+h1{color:#4f9eff;font-size:2rem;margin:0 0 20px;border-bottom:2px solid rgba(79,158,255,.3);padding-bottom:14px;text-align:center}
+h2{color:#c084fc;font-size:1.35rem;margin:36px 0 14px;padding-left:14px;border-left:4px solid #c084fc}
+h3{color:#a78bfa;font-size:1.1rem;margin:24px 0 10px}
+h4{color:#8fa2dc;font-size:.95rem;margin:18px 0 8px}
+p{margin:10px 0;color:#cbd5e1}
+strong{color:#eef2ff}
+em{color:#c084fc;font-style:normal}
+code{background:rgba(79,158,255,.15);padding:2px 7px;border-radius:5px;font-family:Consolas,monospace;font-size:.85em;color:#c084fc}
+pre{background:rgba(5,15,30,.85);border:1px solid rgba(79,158,255,.2);border-radius:10px;padding:18px;overflow-x:auto;margin:14px 0;direction:ltr;text-align:left}
+pre code{background:none;padding:0;color:#8fa2dc;font-size:.82em;line-height:1.7;display:block;white-space:pre}
+table{width:100%;border-collapse:collapse;margin:16px 0;background:rgba(10,22,40,.5);border-radius:10px;overflow:hidden;display:block;overflow-x:auto}
+th,td{padding:11px 14px;text-align:left;border-bottom:1px solid rgba(79,158,255,.15)}
+th{background:rgba(79,158,255,.12);color:#4f9eff;font-weight:700;font-size:.88em}
+td{font-size:.86em}
+tr:last-child td{border-bottom:none}
+hr{border:none;height:1px;background:linear-gradient(90deg,transparent,rgba(79,158,255,.5),transparent);margin:32px 0}
+blockquote{background:rgba(250,204,21,.1);border-left:3px solid #facc15;color:#facc15;padding:12px 18px;margin:14px 0;border-radius:8px;font-size:.95em;font-style:italic}
+ul,ol{margin:10px 24px;color:#cbd5e1}
+li{margin:5px 0}
+a{color:#4f9eff;text-decoration:none;border-bottom:1px dotted rgba(79,158,255,.4)}
+a:hover{color:#4ade80;border-bottom-color:#4ade80}
+.banner{position:sticky;top:0;z-index:99;background:linear-gradient(90deg,#0a1628,#1a2942);border-bottom:1px solid #4f9eff;padding:10px 20px;text-align:center;font-size:13px;overflow-x:auto;white-space:nowrap}
+.banner a{color:#4ade80;text-decoration:none;font-weight:700;margin:0 10px}
+.banner a.blue{color:#4f9eff}
+.banner a.gray{color:#8fa2dc;font-weight:400}
+.footer{text-align:center;color:#8fa2dc;font-size:.8em;margin-top:50px;padding-top:24px;border-top:1px solid rgba(79,158,255,.15)}
+@media print{
+  body{background:#fff;color:#000;padding:0}
+  .banner{display:none}
+  .container{background:#fff;border:none;box-shadow:none;margin:0;padding:20px;max-width:100%}
+  h1,h2,h3{color:#000;border-color:#000}
+  p,li,td{color:#000}
+  strong,em,code{color:#000}
+  pre{background:#f5f5f5;color:#000;border-color:#ccc}
+  pre code{color:#000}
+  th{background:#eee;color:#000}
+  a{color:#000}
+  blockquote{background:#fef9e7;color:#7d6608}
+}
+@media(max-width:700px){.container{padding:24px 20px;margin:15px;border-radius:12px}h1{font-size:1.4rem}h2{font-size:1.1rem}}
+</style>
+</head>
+<body>
+
+<div class="banner">
+<span style="background:linear-gradient(135deg,#4f9eff,#c084fc);color:#fff;padding:2px 10px;border-radius:12px;font-weight:700;font-size:11px">v1.4</span>
+<a href="index.html">Home</a>
+<a href="positioning.html">Positioning</a>
+<a href="deployment.html">Deployment</a>
+<a href="operations.html">Operations</a>
+<a href="compliance.html">Compliance</a>
+<a href="offline-license.html" class="blue">Offline Signer</a>
+</div>
+
+<div class="container">
+<h1>Horizon Core v1.4 — Comprehensive Technical Proposal</h1>
+<p><strong>Version</strong>: 1.4</p>
+<p><strong>Date</strong>: October 2026</p>
+<p><strong>Status</strong>: Deployable · Tested · Documented</p>
+<p><strong>Audience</strong>: Independent technical review, banking, industry, regulatory</p>
+<hr>
+<h2>Executive Summary</h2>
+<p>Horizon Core is an <strong>evidence and governance layer</strong> that installs alongside existing</p>
+<p>banking and industrial infrastructure. It does not replace Core Banking, it does not</p>
+<p>replace SCADA. It does one thing: it makes every operation <strong>provably authentic</strong> and</p>
+<p><strong>independently verifiable</strong> — offline, without a server, without trust in an API.</p>
+<p><strong>Core capability</strong>: every transaction, sensor reading, or license statement is</p>
+<p>cryptographically signed with <strong>ECDSA on secp256k1</strong>, chained into a **Merkle tree</p>
+<p>(RFC 6962)**, and can be verified by any third party using only a public key and a</p>
+<p>proof — nothing else.</p>
+<p><strong>Design principles</strong>:</p>
+<ol>
+<li><strong>Private key never leaves the USB.</strong> Not the browser, not a server, not an API.</li>
+<li><strong>Verification requires only the public key.</strong> Even a fully compromised Switch</li>
+</ol>
+<p>   cannot forge a license.</p>
+<ol>
+<li><strong>Offline-first.</strong> The entire chain works with zero internet connectivity.</li>
+<li><strong>Fail-closed.</strong> Missing security preconditions halt startup; never a degraded mode.</li>
+<li><strong>Test-backed claims.</strong> Every security statement is backed by a reproducible test.</li>
+</ol>
+<hr>
+<h2>1. The Problem</h2>
+<p>Organizations operating in regulated environments face a recurring challenge:</p>
+<blockquote>*"When a regulator, auditor, or court asks about a number from six months ago,</blockquote>
+<blockquote> can we prove it hasn't been changed?"*</blockquote>
+<p>Today, the answer is usually a spreadsheet, a log file, and a verbal assurance. None</p>
+<p>of these are cryptographically verifiable. Logs are editable. Spreadsheets are</p>
+<p>mutable. Verbal assurances are not evidence.</p>
+<p>The gap is not a lack of data. It is a <strong>lack of provable integrity</strong> for that data.</p>
+<h3>What Horizon Core provides</h3>
+<ul>
+<li><strong>Per-operation cryptographic signature</strong> — every event is uniquely signed</li>
+<li><strong>Immutable Merkle chain</strong> — history cannot be rewritten without detection</li>
+<li><strong>Independent verification</strong> — a third party verifies with public key + proof only</li>
+<li><strong>Offline operation</strong> — for air-gapped sites, no internet required</li>
+</ul>
+<hr>
+<h2>2. What This System Is Not</h2>
+<p>We state boundaries explicitly to build trust:</p>
+<ul>
+<li>❌ <strong>Not a Core Banking replacement.</strong> Your CBS remains untouched. Zero code changes.</li>
+<li>❌ <strong>Not a SCADA or PLC replacement.</strong> Industrial equipment remains untouched.</li>
+<li>❌ <strong>Not a distributed consensus system</strong> (yet). Single-node with immutable chain.</li>
+<li>❌ <strong>Not hardware-backed</strong> (yet). Software keys only; HSM integration in roadmap.</li>
+<li>❌ <strong>Not FIPS 186-5 certified.</strong> secp256k1 is SEC 2 (Bitcoin/Ethereum curve),</li>
+</ul>
+<p>  not approved under FIPS. If a regulator mandates FIPS, this is a separate decision.</p>
+<p><strong>Honesty is a feature.</strong> Systems that claim to be everything deliver nothing.</p>
+<hr>
+<h2>3. Cryptographic Foundation</h2>
+<h3>3.1 Curve and Algorithm</h3>
+<table><thead><tr><th>Property</th><th>Value</th></tr></thead><tbody>
+<tr><td>Algorithm</td><td>ECDSA</td></tr>
+<tr><td>Curve</td><td>secp256k1 (SEC 2)</td></tr>
+<tr><td>Server library</td><td><code>github.com/decred/dcrd/dcrec/secp256k1/v4</code></td></tr>
+<tr><td>Browser library</td><td><code>@noble/secp256k1</code> v2.1.0</td></tr>
+<tr><td>Hash</td><td>SHA-256</td></tr>
+<tr><td>Determinism</td><td>RFC 6979 (no randomness)</td></tr>
+<tr><td>Signature format</td><td>64-byte raw `R</td><td></td><td>S` (not DER, not ASN.1)</td></tr>
+<tr><td>Key storage</td><td>PEM with header <code>HORIZON SECP256K1 PRIVATE KEY</code></td></tr>
+</tbody></table>
+<p><strong>Why secp256k1?</strong></p>
+<ul>
+<li>Same curve as Bitcoin and Ethereum — industry-standard tooling exists</li>
+<li>Smaller signatures (64 bytes vs. ~70 for DER)</li>
+<li>Deterministic signing (RFC 6979) — no nonce reuse risk</li>
+<li>Mature, well-audited library (decred)</li>
+</ul>
+<h3>3.2 Canonical Payload</h3>
+<p>Every signature is over a pipe-separated canonical payload:</p>
+<pre><code>
+&lt;license_id&gt;|&lt;product_id&gt;|&lt;user_id&gt;|&lt;volume&gt;|&lt;merkle_root&gt;|&lt;status&gt;|&lt;expires_at_RFC3339_Z&gt;
+</code></pre>
+<p><strong>Rules:</strong></p>
+<ul>
+<li><code>expires_at</code>: UTC, seconds precision, no nanoseconds (<code>2027-10-11T12:48:03Z</code>)</li>
+<li><code>merkle_root</code>: 64 lowercase hex chars, or empty string</li>
+<li><code>status</code>: literal <code>active</code> at signing time</li>
+<li>Any byte change invalidates the signature</li>
+</ul>
+<h3>3.3 Verification Rules (Mandatory Rejections)</h3>
+<p>A conforming verifier <strong>MUST reject</strong>:</p>
+<ol>
+<li>Signature length ≠ 64 bytes</li>
+<li>Non-hex signature</li>
+<li>R = 0 or S = 0</li>
+<li>R ≥ N or S ≥ N (N = secp256k1 order)</li>
+<li>S &gt; N/2 (high-S malleability)</li>
+<li>Public key not on secp256k1</li>
+<li>Public key on P-256 or any other curve</li>
+<li>Any byte change in the signed payload</li>
+<li>DER or ASN.1 encoding (only raw <code>R||S</code>)</li>
+<li>Malformed hex in signature</li>
+</ol>
+<h3>3.4 Key Lifecycle</h3>
+<table><thead><tr><th>Layer</th><th>Private Key</th><th>Public Key</th></tr></thead><tbody>
+<tr><td><strong>Authority</strong></td><td>✅ Only here</td><td>Exported for distribution</td></tr>
+<tr><td><strong>Backend</strong></td><td>❌</td><td>❌</td></tr>
+<tr><td><strong>Switch</strong></td><td>❌</td><td>✅ Only public</td></tr>
+<tr><td><strong>Browser</strong></td><td>❌</td><td>❌</td></tr>
+<tr><td><strong>Offline Verifier</strong></td><td>❌</td><td>✅ User-provided</td></tr>
+</tbody></table>
+<p><strong>Key rotation</strong>: on-demand, with an invalidation record signed by the new key.</p>
+<p>Historical blocks remain valid (signed with the old key). No mass re-signing.</p>
+<hr>
+<h2>4. Architecture</h2>
+<h3>4.1 Ecosystem Overview</h3>
+<pre><code>
+┌──────────────────────────────────────────────────────────────────┐
+│                    Horizon Core Ecosystem                        │
+├──────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│   ┌──────────────┐   ┌──────────────┐   ┌──────────────┐        │
+│   │  Authority   │   │   Backend    │   │   Switch     │        │
+│   │  (offline)   │   │   (API)      │   │  (Gateway)   │        │
+│   │              │   │              │   │              │        │
+│   │ Private Key  │──▶│ License      │──▶│ Policy       │        │
+│   │ on USB       │   │ Issuance     │   │ Enforcement  │        │
+│   │              │   │              │   │              │        │
+│   │ ECDSA        │   │ REST API     │   │ Public Key   │        │
+│   │ secp256k1    │   │ PostgreSQL   │   │ Only         │        │
+│   └──────────────┘   │ or SQLite    │   └──────────────┘        │
+│                      └──────────────┘                            │
+│                                                                  │
+│   ┌──────────────┐   ┌──────────────┐   ┌──────────────┐        │
+│   │ Merkle       │   │ Offline      │   │ Browser      │        │
+│   │ Ledger       │   │ Verifier     │   │ Signer       │        │
+│   │              │   │              │   │              │        │
+│   │ RFC 6962     │   │ Standalone   │   │ USB-based    │        │
+│   │ Inclusion    │   │ No Server    │   │ noble-       │        │
+│   │ Proof        │   │ Required     │   │ secp256k1    │        │
+│   └──────────────┘   └──────────────┘   └──────────────┘        │
+│                                                                  │
+└──────────────────────────────────────────────────────────────────┘
+</code></pre>
+<h3>4.2 Trust Root Separation</h3>
+<p>This is the single most important architectural decision:</p>
+<p><strong>The private key exists in exactly one place: the USB.</strong></p>
+<ul>
+<li>Backend <strong>cannot</strong> sign — it forwards signing requests to Authority</li>
+<li>Switch <strong>cannot</strong> sign — it holds only the public key</li>
+<li>Browser <strong>cannot</strong> retain the key — it reads 32 bytes into RAM, signs, and drops</li>
+<li>Verifier <strong>cannot</strong> sign — it only checks signatures</li>
+</ul>
+<p><strong>Consequence</strong>: compromising Backend or Switch does not compromise the trust root.</p>
+<p>An attacker would need physical access to the USB.</p>
+<hr>
+<h2>5. Deployment Positioning</h2>
+<h3>5.1 Banking (CBS/PS Layer Model)</h3>
+<table><thead><tr><th>Layer</th><th>System</th><th>Horizon Integration</th></tr></thead><tbody>
+<tr><td>L7</td><td>Customer channels</td><td>—</td></tr>
+<tr><td>L6</td><td>API Gateway</td><td>—</td></tr>
+<tr><td>L5</td><td>Payment switch</td><td>Sign each ISO/RTGS message (read-only)</td></tr>
+<tr><td>L4</td><td>Core Banking</td><td>Anchor each settlement (read-only)</td></tr>
+<tr><td>L3</td><td>Treasury</td><td>Register daily reports</td></tr>
+<tr><td>L2</td><td>AML/Fraud</td><td>Provide proofs to regulators</td></tr>
+<tr><td><strong>L1</strong></td><td><strong>Audit &amp; Evidence</strong></td><td><strong>← Horizon sits here</strong></td></tr>
+<tr><td>L0</td><td>Infrastructure</td><td>Independent, read-only</td></tr>
+</tbody></table>
+<p><strong>Integration contract</strong>: Horizon reads from CBS via REST, message queue, or file</p>
+<p>drop. It never writes. If Horizon is unplugged, CBS continues unchanged.</p>
+<h3>5.2 Industry (Purdue ISA-95)</h3>
+<table><thead><tr><th>Layer</th><th>System</th><th>Horizon Integration</th></tr></thead><tbody>
+<tr><td>L5</td><td>Cloud/Enterprise</td><td>Periodic reports</td></tr>
+<tr><td>L4</td><td>ERP/MES</td><td>Periodic reports</td></tr>
+<tr><td>L3</td><td>Historian</td><td>Send hashes</td></tr>
+<tr><td>L2</td><td>SCADA/HMI</td><td>Receive readings (OPC-UA/Modbus)</td></tr>
+<tr><td><strong>L2.5</strong></td><td><strong>Evidence layer</strong></td><td><strong>← Horizon sits here</strong></td></tr>
+<tr><td>L1</td><td>Control (PLC/RTU)</td><td>—</td></tr>
+<tr><td>L0</td><td>Field (sensors)</td><td>—</td></tr>
+</tbody></table>
+<p><strong>Example — Refinery</strong>: pressure and temperature are read every 30 seconds. Each</p>
+<p>reading becomes a Merkle leaf. Every 30 seconds, a Merkle root is signed. When the</p>
+<p>environmental regulator asks for a specific number, you respond with a mathematical</p>
+<p>proof, not a spreadsheet.</p>
+<hr>
+<h2>6. Component Deep-Dive</h2>
+<h3>6.1 Cryptographic Core (<code>internal/crypto/</code>)</h3>
+<table><thead><tr><th>File</th><th>Purpose</th></tr></thead><tbody>
+<tr><td><code>secp256k1.go</code></td><td>Sign, verify, PEM parse, public key operations</td></tr>
+<tr><td><code>crypto.go</code></td><td>High-level wrappers (<code>SignData</code>, <code>VerifySignature</code>, …)</td></tr>
+<tr><td><code>secp256k1_test.go</code></td><td>Primitive tests</td></tr>
+<tr><td><code>e2e_test.go</code></td><td>Full sign → verify round-trip</td></tr>
+<tr><td><code>tamper_test.go</code></td><td>Single-byte flip rejection (all 64 bytes)</td></tr>
+<tr><td><code>expiry_test.go</code></td><td>Issued/expires boundaries</td></tr>
+<tr><td><code>hwid_test.go</code></td><td>Hardware ID matching policy</td></tr>
+</tbody></table>
+<h3>6.2 License Protocol (<code>internal/license/protocol.go</code>)</h3>
+<ul>
+<li><code>Statement</code> — signed fields (immutable)</li>
+<li><code>SignedLicense</code> — wire envelope</li>
+<li><code>Validate()</code> — full verification (signature + expiry + HWID)</li>
+</ul>
+<h3>6.3 Merkle Ledger (<code>internal/merkle/proof.go</code>)</h3>
+<ul>
+<li><code>BuildProof(leaves, index)</code> — generate inclusion proof</li>
+<li><code>Proof.Verify(root)</code> — independent verification</li>
+<li>RFC 6962 compliant: leaf prefix <code>0x00</code>, node prefix <code>0x01</code></li>
+<li>Odd-level self-pairing (handles non-power-of-2 leaf counts)</li>
+</ul>
+<h3>6.4 Backend (<code>cmd/api/</code>)</h3>
+<p><strong>Endpoints:</strong></p>
+<table><thead><tr><th>Method</th><th>Path</th><th>Purpose</th></tr></thead><tbody>
+<tr><td>GET</td><td><code>/api/v1/health</code></td><td>Liveness</td></tr>
+<tr><td>POST</td><td><code>/api/v1/license/generate</code></td><td>Issue license with signature</td></tr>
+<tr><td>POST</td><td><code>/api/v1/license/verify</code></td><td>Server-side verify</td></tr>
+</tbody></table>
+<p><strong>Storage modes:</strong></p>
+<ul>
+<li><strong>PostgreSQL</strong> — online, replication-capable, recommended for central offices</li>
+<li><strong>SQLite</strong> — offline, single-file, WAL mode, recommended for remote sites</li>
+</ul>
+<p>Both modes are <strong>feature-identical</strong>.</p>
+<p><strong>Security:</strong> Fail-closed on missing <code>ADMIN_TOKEN</code> (≥ 32 chars). AutoMigrate on startup.</p>
+<h3>6.5 Switch — Policy Enforcement Gateway (<code>cmd/switch/</code>)</h3>
+<p><strong>Endpoints:</strong></p>
+<table><thead><tr><th>Method</th><th>Path</th><th>Purpose</th></tr></thead><tbody>
+<tr><td>GET</td><td><code>/health</code></td><td>Liveness</td></tr>
+<tr><td>POST</td><td><code>/api/v1/license/check</code></td><td>Verify with public key only</td></tr>
+</tbody></table>
+<p><strong>Enforcement:</strong></p>
+<ul>
+<li>HWID binding (license tied to specific hardware)</li>
+<li>Expiry check with grace period</li>
+<li>Status check (<code>active</code> / <code>revoked</code> / <code>expired</code>)</li>
+<li>CORS for <code>file://</code> origins (enables offline browser page)</li>
+<li>Air-gap mode (blocks all outbound HTTP)</li>
+</ul>
+<p><strong>Attack surface:</strong> 192 penetration vectors across 12 categories, all blocked.</p>
+<h3>6.6 Command-Line Tools</h3>
+<table><thead><tr><th>Tool</th><th>Purpose</th></tr></thead><tbody>
+<tr><td><code>cmd/authority-keygen</code></td><td>Generate Authority keypair</td></tr>
+<tr><td><code>cmd/horizon-keygen</code></td><td>Fast secp256k1 keygen</td></tr>
+<tr><td><code>cmd/horizon-pubkey</code></td><td>Extract public key from private key</td></tr>
+<tr><td><code>cmd/horizon-usbkey</code></td><td>Auto-detect key on mounted USB drives</td></tr>
+<tr><td><code>cmd/license-signer</code></td><td>Local signing service (:9999) for automation</td></tr>
+<tr><td><code>cmd/licenseverify</code></td><td>Offline verifier — no server required</td></tr>
+</tbody></table>
+<h3>6.7 Public Pages (Horizon Security Assessment)</h3>
+<p>Separate public repository: <code>beaconchain-horizon/horizon-security-assessment</code>.</p>
+<table><thead><tr><th>Page</th><th>Purpose</th></tr></thead><tbody>
+<tr><td><code>index.html</code></td><td>Landing</td></tr>
+<tr><td><code>positioning.html</code></td><td>Layer map (banking + industry)</td></tr>
+<tr><td><code>deployment.html</code></td><td>Hardware, OS, CBS/SCADA integration</td></tr>
+<tr><td><code>operations.html</code></td><td>SLA, backup, DR, training</td></tr>
+<tr><td><code>compliance.html</code></td><td>Standards, court admissibility, legal</td></tr>
+<tr><td><code>offline-license.html</code></td><td>USB-based signing (browser)</td></tr>
+<tr><td><code>monitor.html</code></td><td>SOC dashboard</td></tr>
+<tr><td><code>store.html</code></td><td>Product catalog</td></tr>
+</tbody></table>
+<hr>
+<h2>7. Trust Model</h2>
+<h3>7.1 Chain of Trust</h3>
+<pre><code>
+USB (private key)
+    ↓
+Authority (signs)
+    ↓
+Backend (issues licenses)
+    ↓
+Switch (verifies with public key)
+    ↓
+Auditor / Regulator (independent verification)
+</code></pre>
+<h3>7.2 Design Principles</h3>
+<p><strong>Zero Trust in verification.</strong> Switch holds only public key. Even full Switch</p>
+<p>compromise cannot forge licenses.</p>
+<p><strong>Offline-first.</strong> The entire chain works without internet. Key is on USB.</p>
+<p><strong>Fail-closed.</strong> Missing security preconditions halt startup — never a degraded mode.</p>
+<p><strong>Provable claims.</strong> Every security statement backed by a test that can be re-run.</p>
+<h3>7.3 Attack Surface Reduction</h3>
+<table><thead><tr><th>Threat</th><th>Mitigation</th></tr></thead><tbody>
+<tr><td>Log tampering</td><td>Immutable chain + Merkle proof</td></tr>
+<tr><td>Signature forgery</td><td>secp256k1 + DER/P-256 rejection</td></tr>
+<tr><td>Replay</td><td>Nonce + timestamp window</td></tr>
+<tr><td>SSRF</td><td>39 of 40 vectors blocked</td></tr>
+<tr><td>DoS</td><td>Rate limit + connection limit</td></tr>
+<tr><td>Unauthorized API access</td><td>Fail-closed without ADMIN_TOKEN</td></tr>
+<tr><td>Private key theft</td><td>USB offline, never enters browser</td></tr>
+<tr><td>Wrong hardware install</td><td>HWID binding</td></tr>
+<tr><td>Dependency compromise</td><td>Dependabot + govulncheck + CodeQL</td></tr>
+</tbody></table>
+<hr>
+<h2>8. Security Posture</h2>
+<h3>8.1 What Is Proven (Test-Backed)</h3>
+<table><thead><tr><th>Capability</th><th>Test</th><th>Status</th></tr></thead><tbody>
+<tr><td>secp256k1 signing (R</td><td></td><td>S 64-byte)</td><td><code>TestSign_FormatIsExactly64Bytes</code></td><td>✅</td></tr>
+<tr><td>RFC 6979 determinism</td><td><code>TestSign_IsDeterministic</code></td><td>✅</td></tr>
+<tr><td>Sign → Verify round-trip</td><td><code>TestSignVerify_RoundTrip</code></td><td>✅</td></tr>
+<tr><td>Single-byte flip rejection (all 64)</td><td><code>TestTamper_RejectsAllSingleByteFlips</code></td><td>✅</td></tr>
+<tr><td>Payload tamper rejection</td><td><code>TestTamper_RejectsPayloadChange</code></td><td>✅</td></tr>
+<tr><td>Cross-key rejection</td><td><code>TestTamper_RejectsCrossKey</code></td><td>✅</td></tr>
+<tr><td>P-256 rejection</td><td><code>TestVerifyDataRejectsP256PublicKey</code></td><td>✅</td></tr>
+<tr><td>Legacy DER rejection</td><td><code>TestVerify_RejectsLegacyDER</code></td><td>✅</td></tr>
+<tr><td>Zero/out-of-range R,S rejection</td><td><code>TestVerify_RejectsZeroRorS</code></td><td>✅</td></tr>
+<tr><td>HWID binding</td><td><code>TestHWID_Policy</code></td><td>✅</td></tr>
+<tr><td>Expiry boundaries</td><td><code>TestExpiry_Boundaries</code></td><td>✅</td></tr>
+<tr><td>Merkle inclusion proof</td><td><code>TestProof_RoundTrip</code></td><td>✅</td></tr>
+<tr><td>Merkle tampered leaf rejection</td><td><code>TestProof_RejectsTamperedLeaf</code></td><td>✅</td></tr>
+<tr><td>E2E: USB → Sign → Verify</td><td><code>TestE2E_LicenseSigningRoundTrip</code></td><td>✅</td></tr>
+</tbody></table>
+<p>All tests run on every push via <code>.github/workflows/v14-ci.yml</code>.</p>
+<h3>8.2 What Is Not Claimed (Honest)</h3>
+<ul>
+<li><strong>No FIPS 186-5 certification.</strong> secp256k1 is not under FIPS. If a regulator</li>
+</ul>
+<p>  requires FIPS, that is a separate decision, and P-256 build could be provided</p>
+<p>  (but the two curves are not compatible on the same chain).</p>
+<ul>
+<li><strong>No hardware HSM</strong> (yet). Software keys only. HSM in roadmap Q4 2026.</li>
+<li><strong>No ISO/IEC 27001 certification</strong> (yet). Documentation in preparation Q2 2027.</li>
+<li><strong>No distributed consensus</strong> (yet). Single-node with immutable chain.</li>
+</ul>
+<p>  Multi-node in roadmap Q1 2027.</p>
+<p><strong>Trust is built through honesty about limitations, not by claiming completeness.</strong></p>
+<h3>8.3 Independent Verifiability</h3>
+<p>Every auditor, regulator, or court can verify licenses <strong>independently</strong> with:</p>
+<ol>
+<li>A public key (provided once, out-of-band)</li>
+<li>A license file (JSON)</li>
+<li>The <code>licenseverify</code> tool (open source)</li>
+</ol>
+<p>No trust in Horizon required. No API call. No internet.</p>
+<hr>
+<h2>9. Performance and Scale</h2>
+<h3>9.1 Sizing Guide</h3>
+<table><thead><tr><th>Environment</th><th>Records/day</th><th>Recommended mode</th><th>Hardware</th></tr></thead><tbody>
+<tr><td>Single site (10 sensors)</td><td>100K</td><td>SQLite</td><td>4 core / 8 GB</td></tr>
+<tr><td>Oil refinery</td><td>5M</td><td>PostgreSQL</td><td>8 core / 16 GB</td></tr>
+<tr><td>Central bank settlement</td><td>20M</td><td>PostgreSQL + replication</td><td>16 core / 32 GB</td></tr>
+<tr><td>Air-gapped critical</td><td>1M</td><td>SQLite + USB export</td><td>8 core / 16 GB</td></tr>
+</tbody></table>
+<h3>9.2 Batched Merkle Anchoring</h3>
+<ul>
+<li>Batch window: 30 seconds (configurable)</li>
+<li>Max readings per batch: 50,000</li>
+<li>Async persist (does not block reads)</li>
+<li>In-memory ledger + WAL-backed durability</li>
+</ul>
+<h3>9.3 Operational Characteristics</h3>
+<ul>
+<li><strong>RPO</strong> (Recovery Point Objective): 5 minutes (Postgres) / 24 hours (SQLite)</li>
+<li><strong>RTO</strong> (Recovery Time Objective): 1 hour (Postgres) / 15 minutes (SQLite)</li>
+<li><strong>Availability target</strong>: 99.5% per month</li>
+<li><strong>Zero data loss</strong>: WAL persistence</li>
+</ul>
+<hr>
+<h2>10. Compliance and Standards</h2>
+<table><thead><tr><th>Standard</th><th>Status</th><th>Notes</th></tr></thead><tbody>
+<tr><td>RFC 6962 (Merkle)</td><td>✅ Implemented</td><td>Binary + trinary tree</td></tr>
+<tr><td>SEC 2 (secp256k1)</td><td>✅ Implemented</td><td>Curve parameters verified</td></tr>
+<tr><td>RFC 6979 (deterministic ECDSA)</td><td>✅ Implemented</td><td>No randomness</td></tr>
+<tr><td>ISO/IEC 27001</td><td>⏳ Roadmap Q2 2027</td><td>Documentation in progress</td></tr>
+<tr><td>FIPS 186-5</td><td>❌ Not requested</td><td>secp256k1 outside FIPS scope</td></tr>
+<tr><td>PCI-DSS</td><td>⏳ If handling card data</td><td>Separate assessment</td></tr>
+<tr><td>SOC 2 Type II</td><td>⏳ For cloud deployments</td><td>Separate assessment</td></tr>
+</tbody></table>
+<h3>Court Admissibility</h3>
+<p>Audit logs are admissible if the following conditions are met:</p>
+<ol>
+<li><strong>Chain of custody</strong> — private key stored offline (USB), history documented</li>
+<li><strong>Timestamp proof</strong> — each block signature includes issue time, Merkle root</li>
+</ol>
+<p>   published daily</p>
+<ol>
+<li><strong>Verification independence</strong> — third party can verify with public key only</li>
+<li><strong>No backdating</strong> — deterministic signatures + Merkle chain prevents rewriting</li>
+</ol>
+<p><strong>Producing in court</strong>: ledger copy, public key, Merkle root log, block signatures,</p>
+<p>expert verification with <code>licenseverify</code>.</p>
+<hr>
+<h2>11. Deployment and Integration</h2>
+<h3>11.1 Hardware Requirements</h3>
+<table><thead><tr><th>Resource</th><th>Minimum</th><th>Recommended</th></tr></thead><tbody>
+<tr><td>CPU</td><td>4 core x86_64</td><td>8 core</td></tr>
+<tr><td>RAM</td><td>8 GB</td><td>16 GB</td></tr>
+<tr><td>Disk</td><td>100 GB SSD</td><td>500 GB NVMe</td></tr>
+<tr><td>OS</td><td>Ubuntu 22.04 LTS / Win Server 2019</td><td>Ubuntu 24.04 LTS</td></tr>
+</tbody></table>
+<h3>11.2 Integration Methods</h3>
+<table><thead><tr><th>Source</th><th>Protocol</th><th>Direction</th></tr></thead><tbody>
+<tr><td>CBS with REST API</td><td>HTTP polling</td><td>Read-only</td></tr>
+<tr><td>CBS with message queue</td><td>Kafka / RabbitMQ</td><td>Read-only</td></tr>
+<tr><td>CBS with files</td><td>SFTP / CSV watcher</td><td>Read-only</td></tr>
+<tr><td>SCADA (OPC-UA)</td><td>OPC-UA client</td><td>Read-only</td></tr>
+<tr><td>SCADA (Modbus)</td><td>Modbus TCP client</td><td>Read-only</td></tr>
+<tr><td>Historian SQL</td><td>Scheduled query</td><td>Read-only</td></tr>
+</tbody></table>
+<p><strong>Zero changes to CBS or SCADA code. Zero schema changes. Zero downtime.</strong></p>
+<h3>11.3 Installation Time</h3>
+<ul>
+<li>Prepared server install: <strong>~1 hour</strong></li>
+<li>Operator training: <strong>2 days</strong></li>
+<li>Admin training: <strong>3 additional days</strong></li>
+</ul>
+<hr>
+<h2>12. Operations and Support</h2>
+<h3>12.1 SLA</h3>
+<table><thead><tr><th>Severity</th><th>Definition</th><th>Response</th><th>Resolution</th></tr></thead><tbody>
+<tr><td>P1 — Critical</td><td>Ledger stopped, licenses rejected</td><td>1h</td><td>4h</td></tr>
+<tr><td>P2 — Major</td><td>Performance degraded &gt; 50%</td><td>4h</td><td>24h</td></tr>
+<tr><td>P3 — Minor</td><td>Single feature impaired</td><td>24h</td><td>7d</td></tr>
+<tr><td>P4 — Cosmetic</td><td>UI / typo</td><td>7d</td><td>Next release</td></tr>
+</tbody></table>
+<h3>12.2 Backup Strategy</h3>
+<p><strong>PostgreSQL:</strong> daily full + continuous WAL archiving.</p>
+<p><strong>SQLite:</strong> hourly snapshot via <code>.backup</code> (safe while running).</p>
+<p><strong>Both modes:</strong></p>
+<ul>
+<li>Merkle root published to append-only file <code>/backup/merkle-roots.log</code></li>
+<li>Monthly USB export of ledger for off-site storage</li>
+</ul>
+<h3>12.3 Disaster Recovery Scenarios</h3>
+<table><thead><tr><th>Scenario</th><th>RTO</th><th>Data loss</th></tr></thead><tbody>
+<tr><td>Backend crash</td><td>Auto-restart</td><td>Zero</td></tr>
+<tr><td>Disk failure</td><td>1 hour</td><td>≤ 5 minutes</td></tr>
+<tr><td>Database corruption</td><td>1 hour</td><td>≤ 24 hours</td></tr>
+<tr><td>USB key lost</td><td>Key rotation</td><td>Historical blocks valid</td></tr>
+<tr><td>Complete site loss</td><td>4 hours</td><td>≤ 24 hours</td></tr>
+</tbody></table>
+<h3>12.4 Training Program</h3>
+<p><strong>Operator training (2 days):</strong></p>
+<ul>
+<li>Architecture overview</li>
+<li>Service start/stop</li>
+<li>Log reading</li>
+<li>Health checks</li>
+<li>License workflow</li>
+<li>USB handling</li>
+<li>Incident basics</li>
+</ul>
+<p><strong>Administrator training (3 additional days):</strong></p>
+<ul>
+<li>Key rotation</li>
+<li>Merkle proof generation for auditors</li>
+<li>Disaster recovery drills</li>
+<li>Configuration tuning</li>
+<li>Security hardening</li>
+</ul>
+<hr>
+<h2>13. Roadmap</h2>
+<table><thead><tr><th>Phase</th><th>Capability</th><th>Status</th><th>ETA</th></tr></thead><tbody>
+<tr><td>v1.0</td><td>Single-node ledger</td><td>✅ Complete</td><td>—</td></tr>
+<tr><td>v1.1</td><td>Air-gap mode</td><td>✅ Complete</td><td>—</td></tr>
+<tr><td>v1.2</td><td>Dual control</td><td>✅ Complete</td><td>—</td></tr>
+<tr><td>v1.3</td><td>Industrial anchor</td><td>✅ Complete</td><td>—</td></tr>
+<tr><td><strong>v1.4</strong></td><td><strong>secp256k1 + Merkle + offline signer</strong></td><td><strong>✅ Current</strong></td><td>—</td></tr>
+<tr><td>v1.5</td><td>HSM hardware integration</td><td>⏳ Planning</td><td>Q4 2026</td></tr>
+<tr><td>v2.0</td><td>Multi-node consensus</td><td>⏳ Design</td><td>Q1 2027</td></tr>
+<tr><td>v2.1</td><td>ISO/IEC 27001</td><td>⏳ Documentation</td><td>Q2 2027</td></tr>
+<tr><td>v2.2</td><td>FIPS (if required)</td><td>⏳ Optional</td><td>Q3 2027</td></tr>
+</tbody></table>
+<hr>
+<h2>14. Commercial Model</h2>
+<table><thead><tr><th>Item</th><th>One-time</th><th>Recurring</th></tr></thead><tbody>
+<tr><td>Installation</td><td>Included</td><td>—</td></tr>
+<tr><td>Training</td><td>Included</td><td>—</td></tr>
+<tr><td>Annual license</td><td>—</td><td>Per contract</td></tr>
+<tr><td>Support (business hours)</td><td>—</td><td>Included</td></tr>
+<tr><td>Support (24/7)</td><td>—</td><td>Optional</td></tr>
+<tr><td>On-site visits</td><td>Travel</td><td>Per visit</td></tr>
+</tbody></table>
+<p><strong>License types:</strong></p>
+<ul>
+<li>Per-site annual</li>
+<li>Hardware-bound (tied to HWID)</li>
+<li>Volume tier (by annual transaction count)</li>
+<li>Air-gap add-on</li>
+<li>Enterprise (source access + custom integration)</li>
+</ul>
+<hr>
+<h2>15. What Distinguishes This System</h2>
+<ol>
+<li><strong>Private key never leaves USB.</strong> Even in browser, only 32 bytes in RAM.</li>
+<li><strong>Switch holds only public key.</strong> Compromise cannot forge licenses.</li>
+<li><strong>Offline-first by design.</strong> Full chain works without internet.</li>
+<li><strong>Test-backed claims.</strong> 15+ security tests + 192 penetration vectors.</li>
+<li><strong>Honest about limitations.</strong> FIPS/HSM/consensus not claimed. Trust through truth.</li>
+<li><strong>Independently verifiable.</strong> Auditor verifies with public key + proof only.</li>
+<li><strong>Standards-compliant.</strong> RFC 6962, RFC 6979, SEC 2, GDPR, SCC.</li>
+<li><strong>Zero changes to existing systems.</strong> CBS and SCADA remain untouched.</li>
+</ol>
+<hr>
+<h2>16. Request for Review</h2>
+<p>Since this document is submitted for independent technical review, we request:</p>
+<p><strong>1. Cryptographic review:</strong></p>
+<ul>
+<li>Is the <code>R||S</code> 64-byte format compliant with secp256k1 rules?</li>
+<li>Are the declared rejections sufficient?</li>
+<li>Is the canonical payload resistant to manipulation?</li>
+</ul>
+<p><strong>2. Trust model review:</strong></p>
+<ul>
+<li>Is the Authority/Backend/Switch separation sufficient?</li>
+<li>Is public-key-only verification adequate?</li>
+</ul>
+<p><strong>3. Layer positioning review:</strong></p>
+<ul>
+<li>Are L1-L2 (banking) and L2.5 (industry) correct?</li>
+<li>Are the declared boundaries honest?</li>
+</ul>
+<p><strong>4. Improvement suggestions:</strong></p>
+<ul>
+<li>What is missing from this document?</li>
+<li>What risks may be overlooked?</li>
+<li>What additional standards should be considered?</li>
+</ul>
+<hr>
+<h2>17. An Honest Note</h2>
+<p>Horizon Core is mature but not complete. Version 1.4 is tested on a **single</p>
+<p>installation**, in a local environment and one Switch. Multi-node, HSM, and</p>
+<p>production-scale tests are not yet performed.</p>
+<p>We aim to be <strong>honest first, strong second</strong>. If this document is realistic,</p>
+<p>that is correct. If any claim exceeds evidence, please tell us to correct it.</p>
+<p>Thank you for your time.</p>
+<hr>
+<p><strong>© 2026 Horizon Core · Mahdi Amolimoghaddam</strong></p>
+<p><strong>Last updated</strong>: October 2026</p>
+<div class="footer">
+© 2026 Horizon Core · <a href="https://github.com/beaconchain-horizon">github.com/beaconchain-horizon</a> · Last updated October 2026
+</div>
+</div>
+
+</body>
+</html>
