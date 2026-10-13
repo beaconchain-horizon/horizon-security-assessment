@@ -2,232 +2,339 @@
 <html lang="fa" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<title>Horizon — Offline License Generator</title>
+<title>Horizon Core — Offline License Signer v2</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:Tahoma,sans-serif}
-body{background:linear-gradient(135deg,#0a1628,#1a2942);color:#eef2ff;min-height:100vh;padding:30px}
-.cont{max-width:700px;margin:0 auto;background:rgba(20,32,55,.9);border:1px solid rgba(79,158,255,.3);border-radius:20px;padding:30px}
-h1{color:#4f9eff;text-align:center;margin-bottom:10px;font-size:1.8rem}
-.sub{text-align:center;color:#8fa2dc;font-size:.85rem;margin-bottom:25px}
-.sec{background:rgba(30,45,70,.5);border-radius:12px;padding:18px;margin:15px 0;border-right:3px solid #4f9eff}
-.sec h2{color:#c084fc;font-size:1rem;margin-bottom:12px}
-label{display:block;margin:10px 0 5px;color:#cbd5e1;font-size:.8rem}
-input,select,textarea{width:100%;padding:10px;border-radius:8px;border:1px solid rgba(79,158,255,.3);background:rgba(10,22,40,.8);color:#fff;font-family:inherit;font-size:.85rem}
-input:focus,select:focus,textarea:focus{outline:none;border-color:#4f9eff}
-.btn{width:100%;padding:14px;margin-top:12px;border:none;border-radius:10px;background:linear-gradient(135deg,#4f9eff,#c084fc);color:#fff;font-weight:700;cursor:pointer;font-family:inherit;font-size:.95rem;transition:.2s}
-.btn:hover{opacity:.9;transform:translateY(-2px)}
-.btn.green{background:linear-gradient(135deg,#4ade80,#22c55e);color:#000}
-.btn.gray{background:rgba(30,45,70,.8);border:1px solid rgba(79,158,255,.3)}
-.status{padding:12px;border-radius:8px;margin:10px 0;font-size:.85rem;text-align:center;display:none}
-.status.ok{background:rgba(74,222,128,.15);border:1px solid #4ade80;color:#4ade80}
-.status.err{background:rgba(239,68,68,.15);border:1px solid #ef4444;color:#ef4444}
-.status.info{background:rgba(79,158,255,.15);border:1px solid #4f9eff;color:#4f9eff}
-.key-info{background:rgba(10,22,40,.6);padding:10px;border-radius:8px;margin-top:10px;font-family:monospace;font-size:.7rem;color:#8fa2dc;word-break:break-all;direction:ltr;text-align:left}
-.file-label{display:block;padding:20px;border:2px dashed rgba(79,158,255,.4);border-radius:10px;text-align:center;cursor:pointer;color:#4f9eff;transition:.2s}
-.file-label:hover{background:rgba(79,158,255,.1);border-color:#4f9eff}
-.file-label input{display:none}
-.badge{display:inline-block;background:linear-gradient(135deg,#4f9eff,#c084fc);color:#fff;padding:3px 10px;border-radius:20px;font-size:.7rem;font-weight:700;margin-right:5px}
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, "Segoe UI", Tahoma, sans-serif;
+    background: #0a0e1a;
+    color: #e6edf3;
+    margin: 0;
+    padding: 24px;
+    line-height: 1.7;
+  }
+  .wrap { max-width: 780px; margin: 0 auto; }
+  h1 { color: #58a6ff; font-size: 22px; margin: 0 0 4px; }
+  .sub { color: #8b949e; font-size: 13px; margin-bottom: 24px; }
+  .card {
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+  .card h2 {
+    color: #58a6ff;
+    font-size: 15px;
+    margin: 0 0 14px;
+    font-weight: 600;
+  }
+  label { display: block; font-size: 13px; color: #8b949e; margin: 12px 0 4px; }
+  input, select {
+    width: 100%;
+    padding: 8px 10px;
+    background: #0d1117;
+    border: 1px solid #30363d;
+    border-radius: 6px;
+    color: #e6edf3;
+    font-family: inherit;
+    font-size: 13px;
+  }
+  input:focus, select:focus { outline: none; border-color: #58a6ff; }
+  button {
+    background: #238636;
+    color: #fff;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 6px;
+    font-size: 14px;
+    cursor: pointer;
+    font-family: inherit;
+    margin-top: 16px;
+  }
+  button:disabled { opacity: 0.5; cursor: not-allowed; }
+  button:hover:not(:disabled) { background: #2ea043; }
+  .status {
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    margin-top: 12px;
+  }
+  .status.ok  { background: #0d419d33; color: #79c0ff; border: 1px solid #1f6feb; }
+  .status.err { background: #5d1a1a44; color: #ff7b72; border: 1px solid #f85149; }
+  .status.info{ background: #1f6feb22; color: #58a6ff; border: 1px solid #1f6feb; }
+  pre {
+    background: #0d1117;
+    border: 1px solid #30363d;
+    border-radius: 6px;
+    padding: 12px;
+    font-size: 11px;
+    overflow-x: auto;
+    direction: ltr;
+    text-align: left;
+    color: #e6edf3;
+  }
+  #keyInfo {
+    white-space: pre-wrap;
+    font-size: 12px;
+    color: #8b949e;
+    margin-top: 10px;
+    direction: ltr;
+    text-align: left;
+  }
+  .row { display: flex; gap: 12px; }
+  .row > * { flex: 1; }
+  .hint { color: #8b949e; font-size: 12px; margin-top: 4px; }
+  .badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 11px;
+    background: #1f6feb33;
+    color: #79c0ff;
+    margin-right: 6px;
+  }
 </style>
-<script type="module">
-import * as secp from "https://cdn.jsdelivr.net/npm/@noble/secp256k1@2.1.0/+esm";
-import { hmac } from "https://cdn.jsdelivr.net/npm/@noble/hashes@1.4.0/hmac/+esm";
-import { sha256 } from "https://cdn.jsdelivr.net/npm/@noble/hashes@1.4.0/sha256/+esm";
-secp.etc.hmacSha256Sync = (k, ...m) => hmac(sha256, k, secp.etc.concatBytes(...m));
-window.secp = secp;
-window.secpReady = true;
-</script>
 </head>
 <body>
-<div class="cont">
-<h1>🔷 Offline License Generator</h1>
-<p class="sub">Horizon Core — کاملاً آفلاین · بدون نیاز به سرور</p>
+<div class="wrap">
 
-<div class="sec">
-<h2><span class="badge">۱</span> لود کلید خصوصی از USB</h2>
-<label class="file-label" for="keyFile">
-📁 کلیک کن یا فایل کلید را از USB انتخاب کن
-<input type="file" id="keyFile" accept=".pem,.key,.txt,.hex,.json">
-</label>
-<div id="keyStatus" class="status"></div>
-<div id="keyInfo" class="key-info" style="display:none"></div>
+  <h1>Horizon Core — Offline License Signer <span class="badge">v2</span></h1>
+  <div class="sub">
+    کاملاً آفلاین · کلید خصوصی از USB · امضا در RAM · پاک‌سازی بعد از امضا
+  </div>
+
+  <!-- ═══════════════════════════════════════════════ -->
+  <!-- 1. Load private key                             -->
+  <!-- ═══════════════════════════════════════════════ -->
+  <div class="card">
+    <h2>۱. لود کلید خصوصی از USB</h2>
+    <label for="keyFile">📁 فایل کلید (HEX-32 یا 0xHEX-32)</label>
+    <input type="file" id="keyFile" accept=".txt,.key,.pem,text/plain">
+    <div id="keyInfo"></div>
+    <div id="keyStatus"></div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════ -->
+  <!-- 2. License fields                               -->
+  <!-- ═══════════════════════════════════════════════ -->
+  <div class="card">
+    <h2>۲. اطلاعات لایسنس</h2>
+
+    <label for="licId">شناسه لایسنس (License ID)</label>
+    <input id="licId" type="text" value="HORIZON-GOLD-001" placeholder="HORIZON-...">
+
+    <label for="userId">سازمان هدف</label>
+    <select id="userId">
+      <option value="bank-markazi">بانک مرکزی</option>
+      <option value="bank-melli">بانک ملی</option>
+      <option value="bank-mellat">بانک ملت</option>
+      <option value="nicico">صنایع مس</option>
+      <option value="foolad">فولاد</option>
+      <option value="abadan">پالایشگاه آبادان</option>
+      <option value="custom">سازمان دیگر (دستی)</option>
+    </select>
+    <input id="customUser" type="text" placeholder="user_id" style="display:none;margin-top:6px;">
+
+    <label for="productId">شناسه محصول</label>
+    <input id="productId" type="text" value="horizon-core">
+
+    <div class="row">
+      <div>
+        <label for="volume">حجم (تراکنش مجاز)</label>
+        <input id="volume" type="number" value="1000000" min="1">
+      </div>
+      <div>
+        <label for="duration">مدت (روز)</label>
+        <input id="duration" type="number" value="365" min="1">
+      </div>
+    </div>
+
+    <label for="hwid">Hardware ID (اختیاری — خالی = آزاد)</label>
+    <input id="hwid" type="text" placeholder="خالی بگذار اگر نمی‌خواهی به سخت‌افزار قفل شود">
+
+    <button id="genBtn" disabled>🔐 تولید لایسنس آفلاین با ECDSA</button>
+    <div id="genStatus"></div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════ -->
+  <!-- 3. Result                                       -->
+  <!-- ═══════════════════════════════════════════════ -->
+  <div class="card" id="resultCard" style="display:none;">
+    <h2>۳. نتیجه</h2>
+    <button id="dlBtn" disabled style="background:#1f6feb;">💾 دانلود فایل لایسنس (.lic)</button>
+    <pre id="result"></pre>
+  </div>
+
 </div>
 
-<div class="sec">
-<h2><span class="badge">۲</span> اطلاعات لایسنس</h2>
-<label>شناسه لایسنس (License ID)</label>
-<input type="text" id="licId" value="HORIZON-GOLD-001">
-
-<label>سازمان هدف (نمونه)</label>
-<select id="userId">
-<option value="bank-markazi">نمونه سازمان A — بانکداری</option>
-<option value="bank-melli">نمونه سازمان B — بانکداری</option>
-<option value="bank-saderat">نمونه سازمان C — بانکداری</option>
-<option value="bank-mellat">نمونه سازمان D — بانکداری</option>
-<option value="bank-sepeh">نمونه سازمان E — بانکداری</option>
-<option value="nioc">نمونه صنعتی F — نفت</option>
-<option value="nigc">نمونه صنعتی G — گاز</option>
-<option value="tavanir">نمونه صنعتی H — برق</option>
-<option value="msc">نمونه صنعتی I — فولاد</option>
-<option value="nicico">نمونه صنعتی J — مس</option>
-<option value="custom">دستی وارد کن...</option>
-</select>
-<input type="text" id="customUser" placeholder="نام سازمان (دستی)" style="display:none;margin-top:8px">
-
-<label>شناسه محصول</label>
-<input type="text" id="productId" value="horizon-core">
-
-<label>حجم (تعداد تراکنش مجاز)</label>
-<select id="volume">
-<option value="1000000">۱ میلیون — برنزی</option>
-<option value="10000000">۱۰ میلیون — نقره‌ای</option>
-<option value="50000000" selected>۵۰ میلیون — طلایی</option>
-<option value="500000000">۵۰۰ میلیون — سازمانی</option>
-<option value="custom">دستی وارد کن...</option>
-</select>
-<input type="number" id="customVolume" placeholder="تعداد دلخواه" style="display:none;margin-top:8px">
-
-<label>مدت (روز)</label>
-<input type="number" id="duration" value="365" min="1" max="3650">
-
-<label>Hardware ID (اختیاری)</label>
-<input type="text" id="hwid" placeholder="اگر خالی باشد، لایسنس آزاد است">
-
-<button class="btn green" id="genBtn" disabled>🔐 تولید لایسنس آفلاین با ECDSA</button>
-<div id="genStatus" class="status"></div>
-</div>
-
-<div class="sec">
-<h2><span class="badge">۳</span> نتیجه</h2>
-<button class="btn gray" id="dlBtn" disabled>💾 دانلود فایل لایسنس (.lic)</button>
-<pre id="result" class="key-info" style="display:none;max-height:300px;overflow:auto"></pre>
-</div>
-
-<div style="text-align:center;color:#475569;font-size:.75rem;margin-top:20px">
-Horizon Core © ۲۰۲۶ · Offline License Engine v1.1
-</div>
-</div>
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- noble-secp256k1 v2 — pinned, air-gap.                      -->
+<!-- برای محیط air-gap این را local نگه دار. برای دموی آنلاین    -->
+<!-- از CDN زیر استفاده می‌شود.                                  -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<script src="https://cdn.jsdelivr.net/npm/@noble/secp256k1@2.1.0/lib/esm/index.min.js"></script>
 
 <script>
-var $ = function(id){ return document.getElementById(id); };
-var privateKey = null;
-var publicKeyHex = '';
+// ═══════════════════════════════════════════════════════════
+// v2 signer helpers — MUST match Go internal/license/protocol.go
+//
+// Go Statement struct field order:
+//   LicenseID, UserID, ProductID, Volume, Duration,
+//   MerkleRoot, IssuedAt, ExpiresAt, HardwareID
+//
+// Merkle root computed over 8 leaves (NOT including merkle_root):
+//   "license_id=X", "user_id=X", "product_id=X", "volume=X",
+//   "duration=X", "issued_at=X", "expires_at=X", "hardware_id=X"
+//
+// Tree: leaf = SHA256(data), node = SHA256(L||R),
+//       odd level self-pairs with itself.
+// ═══════════════════════════════════════════════════════════
 
-function showStatus(id, type, msg) {
-  var el = $(id);
-  el.className = 'status ' + type;
-  el.textContent = msg;
-  el.style.display = 'block';
+async function hz_sha256(bytes) {
+  return new Uint8Array(await crypto.subtle.digest('SHA-256', bytes));
 }
 
-// ═══════════════════════════════════════════════
-// File picker
-// ═══════════════════════════════════════════════
+function hz_toHex(bytes) {
+  return Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+function hz_concat(a, b) {
+  const out = new Uint8Array(a.length + b.length);
+  out.set(a, 0);
+  out.set(b, a.length);
+  return out;
+}
+
+async function hz_binaryRootNoPrefix(leaves) {
+  if (leaves.length === 0) return new Uint8Array(32);
+  let level = [];
+  for (let i = 0; i < leaves.length; i++) {
+    level.push(await hz_sha256(leaves[i]));
+  }
+  while (level.length > 1) {
+    const next = [];
+    for (let i = 0; i < level.length; i += 2) {
+      const a = level[i];
+      const b = (i + 1 < level.length) ? level[i + 1] : level[i];
+      next.push(await hz_sha256(hz_concat(a, b)));
+    }
+    level = next;
+  }
+  return level[0];
+}
+
+async function hz_computeMerkleRoot(st) {
+  const e = new TextEncoder();
+  const leaves = [
+    e.encode('license_id=' + st.license_id),
+    e.encode('user_id=' + st.user_id),
+    e.encode('product_id=' + st.product_id),
+    e.encode('volume=' + st.volume),
+    e.encode('duration=' + st.duration),
+    e.encode('issued_at=' + st.issued_at),
+    e.encode('expires_at=' + st.expires_at),
+    e.encode('hardware_id=' + st.hardware_id),
+  ];
+  return hz_toHex(await hz_binaryRootNoPrefix(leaves));
+}
+
+// CanonicalBytes = Go json.Marshal(Statement)
+// Keys in struct field order, compact (no spaces).
+function hz_canonicalJSON(st) {
+  return JSON.stringify({
+    license_id:  st.license_id,
+    user_id:     st.user_id,
+    product_id:  st.product_id,
+    volume:      st.volume,
+    duration:    st.duration,
+    merkle_root: st.merkle_root,
+    issued_at:   st.issued_at,
+    expires_at:  st.expires_at,
+    hardware_id: st.hardware_id,
+  });
+}
+
+// ═══════════════════════════════════════════════════════════
+// DOM helpers
+// ═══════════════════════════════════════════════════════════
+const $ = id => document.getElementById(id);
+
+function showStatus(id, kind, text) {
+  const el = $(id);
+  el.className = 'status ' + kind;
+  el.textContent = text;
+}
+
+// ═══════════════════════════════════════════════════════════
+// State — privateKey lives here, wiped after signing
+// ═══════════════════════════════════════════════════════════
+let privateKey = null;      // Uint8Array(32)
+let publicKeyHex = null;    // "0x04..." uncompressed
+let lastLicense = null;     // last signed license (for download)
+
+// Wipe helper — called after signing and on page unload.
+function wipePrivateKey() {
+  try {
+    if (privateKey && typeof privateKey.fill === 'function') {
+      privateKey.fill(0);
+    }
+    privateKey = null;
+  } catch (e) { /* ignore */ }
+}
+window.__hz_wipeKey = wipePrivateKey;
+window.addEventListener('beforeunload', wipePrivateKey);
+window.addEventListener('pagehide', wipePrivateKey);
+
+// ═══════════════════════════════════════════════════════════
+// 1. Load key file
+// ═══════════════════════════════════════════════════════════
 $('keyFile').addEventListener('change', async function(e) {
-  var file = e.target.files[0];
+  const file = e.target.files[0];
   if (!file) return;
   try {
-    var text = await file.text();
-    await loadKey(text, file.name);
-  } catch(err) {
-    showStatus('keyStatus', 'err', '❌ خطا: ' + err.message);
+    let text = (await file.text()).trim();
+    // strip any whitespace/newlines
+    text = text.replace(/\s+/g, '');
+    // accept optional 0x prefix
+    if (text.startsWith('0x') || text.startsWith('0X')) text = text.slice(2);
+    if (!/^[0-9a-fA-F]{64}$/.test(text)) {
+      throw new Error('کلید باید ۶۴ کاراکتر HEX باشد (۳۲ بایت)');
+    }
+    const bytes = new Uint8Array(32);
+    for (let i = 0; i < 32; i++) {
+      bytes[i] = parseInt(text.substr(i * 2, 2), 16);
+    }
+    // validate scalar in range [1, n-1]
+    const secp = window.nobleSecp256k1 || window.secp;
+    if (!secp) throw new Error('کتابخانه secp256k1 لود نشد');
+    const pub = secp.getPublicKey(bytes, false); // 65-byte uncompressed
+    publicKeyHex = '0x' + Array.from(pub).map(b => b.toString(16).padStart(2, '0')).join('');
+    privateKey = bytes;
+
+    $('keyInfo').textContent =
+      '📄 File: ' + file.name + '\n' +
+      '🔑 Format: HEX-32\n' +
+      '📍 Public Key: ' + publicKeyHex;
+    showStatus('keyStatus', 'ok', '✅ کلید بارگذاری شد — در RAM');
+    $('genBtn').disabled = false;
+  } catch (err) {
+    wipePrivateKey();
+    showStatus('keyStatus', 'err', '❌ خطا: ' + (err.message || err.toString()));
   }
 });
 
-// ═══════════════════════════════════════════════
-// Load key (flexible format)
-// ═══════════════════════════════════════════════
-async function loadKey(content, filename) {
-  showStatus('keyStatus', 'info', '⏳ در حال پردازش کلید...');
-  content = content.trim();
-
-  // Try JSON
-  if (content.charAt(0) === '{') {
-    try {
-      var j = JSON.parse(content);
-      content = (j.private_key || j.key || j.privateKey || '').trim();
-    } catch(e) {}
-  }
-
-  // Strip quotes
-  content = content.replace(/^["']+|["']+$/g, '').trim();
-
-  var rawKey;
-  var format = '';
-
-  if (content.indexOf('-----BEGIN') !== -1) {
-    // PEM
-    format = 'PEM';
-    var b64 = content.replace(/-----[^-]+-----/g, '').replace(/\s/g, '');
-    var der = Uint8Array.from(atob(b64), function(c){ return c.charCodeAt(0); });
-    rawKey = der;
-  } else {
-    // Hex
-    var hex = content.replace(/^0x/i, '').replace(/[^0-9a-fA-F]/g, '');
-    if (hex.length === 64) {
-      format = 'HEX-32';
-      rawKey = new Uint8Array(32);
-      for (var i = 0; i < 32; i++) {
-        rawKey[i] = parseInt(hex.substr(i*2, 2), 16);
-      }
-    } else if (hex.length >= 100 && hex.length <= 140) {
-      format = 'HEX-FULL';
-      rawKey = new Uint8Array(hex.length / 2);
-      for (var j = 0; j < rawKey.length; j++) {
-        rawKey[j] = parseInt(hex.substr(j*2, 2), 16);
-      }
-    } else {
-      throw new Error('طول hex = ' + hex.length + ' کاراکتر. باید ۶۴ (کلید خصوصی) یا ۱۳۰ (کلید عمومی) باشه.');
-    }
-  }
-
-  try {
-    var pkcs8Prefix = new Uint8Array([
-      0x30, 0x41, 0x02, 0x01, 0x00, 0x30, 0x13, 0x06, 0x07,
-      0x2a, 0x86, 0x48, 0xce, 0x3d, 0x02, 0x01, 0x06, 0x08,
-      0x2a, 0x86, 0x48, 0xce, 0x3d, 0x03, 0x01, 0x07, 0x04,
-      0x27, 0x30, 0x25, 0x02, 0x01, 0x01, 0x04, 0x20
-    ]);
-    var pkcs8 = new Uint8Array(pkcs8Prefix.length + 32);
-    pkcs8.set(pkcs8Prefix, 0);
-    pkcs8.set(rawKey.slice(0, 32), pkcs8Prefix.length);
-
-    if (!window.secpReady) {
-      throw new Error('secp256k1 not loaded yet - wait a second and retry');
-    }
-    privateKey = rawKey.slice(0, 32);
-
-    // Export public key
-    var pub = window.secp.getPublicKey(privateKey, false); // 65-byte uncompressed
-    var xb = pub.slice(1, 33);
-    var yb = pub.slice(33, 65);
-    publicKeyHex = '0x' + Array.from(pub).map(function(b){ return b.toString(16).padStart(2,'0'); }).join('');
-
-    $('keyInfo').style.display = 'block';
-    $('keyInfo').textContent =
-      '📄 File: ' + filename + '\n' +
-      '🔑 Format: ' + format + '\n' +
-      '📍 Public Key: ' + publicKeyHex;
-
-    showStatus('keyStatus', 'ok', '✅ کلید بارگذاری شد (' + format + ')');
-    $('genBtn').disabled = false;
-  } catch(err) {
-    showStatus('keyStatus', 'err', '❌ خطا در پردازش کلید: ' + (err.message || err.name || err.toString()));
-  }
-}
-
-// ═══════════════════════════════════════════════
-// Dropdown handlers
-// ═══════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
+// 2. userId dropdown
+// ═══════════════════════════════════════════════════════════
 $('userId').addEventListener('change', function(e) {
   $('customUser').style.display = e.target.value === 'custom' ? 'block' : 'none';
 });
-$('volume').addEventListener('change', function(e) {
-  $('customVolume').style.display = e.target.value === 'custom' ? 'block' : 'none';
-});
 
-// ═══════════════════════════════════════════════
-// Generate license
-// ═══════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
+// 3. Generate license
+// ═══════════════════════════════════════════════════════════
 $('genBtn').addEventListener('click', async function() {
   if (!privateKey) {
     showStatus('genStatus', 'err', '❌ اول کلید را بارگذاری کن');
@@ -236,32 +343,65 @@ $('genBtn').addEventListener('click', async function() {
   try {
     showStatus('genStatus', 'info', '⏳ در حال امضا...');
 
-    var licId = $('licId').value.trim();
-    var userId = $('userId').value === 'custom' ? $('customUser').value.trim() : $('userId').value;
-    var productId = $('productId').value.trim();
-    var volume = $('volume').value === 'custom' ? parseInt($('customVolume').value) : parseInt($('volume').value);
-    var duration = parseInt($('duration').value);
-    var hwid = $('hwid').value.trim();
+    // --- read form ---
+    const licId = $('licId').value.trim();
+    const userId = $('userId').value === 'custom'
+      ? $('customUser').value.trim()
+      : $('userId').value;
+    const productId = $('productId').value.trim();
+    const volume = parseInt($('volume').value, 10);
+    const duration = parseInt($('duration').value, 10);
+    const hwid = $('hwid').value.trim();
 
     if (!licId || !userId || !productId || !volume || !duration) {
-      throw new Error('همه فیلدها را پر کن');
+      throw new Error('همه فیلدهای اجباری را پر کن');
+    }
+    if (volume <= 0 || duration <= 0) {
+      throw new Error('حجم و مدت باید مثبت باشند');
     }
 
-    var issuedAt = Math.floor(Date.now() / 1000);
-    var expiresAt = issuedAt + (duration * 86400);
-    var merkleRoot = '';
-    var status = 'active';
+    const issuedAt = Math.floor(Date.now() / 1000);
+    const expiresAt = issuedAt + duration * 86400;
 
-    var expDate = new Date(expiresAt * 1000).toISOString().replace(/\.\d{3}Z$/, 'Z');
-    var msg = licId + '|' + productId + '|' + userId + '|' + volume + '|' + merkleRoot + '|' + status + '|' + expDate;
+    // --- build Statement WITHOUT merkle_root ---
+    const stmtForMerkle = {
+      license_id: licId,
+      user_id: userId,
+      product_id: productId,
+      volume: volume,
+      duration: duration,
+      issued_at: issuedAt,
+      expires_at: expiresAt,
+      hardware_id: hwid,
+    };
 
-    var msgBytes = new TextEncoder().encode(msg);
-    var msgHash = new Uint8Array(await crypto.subtle.digest('SHA-256', msgBytes));
-    var sigBytes = window.secp.sign(msgHash, privateKey).toCompactRawBytes();
-    var sigHex = Array.from(sigBytes).map(function(b){ return b.toString(16).padStart(2,'0'); }).join('');
+    // --- compute merkle root (8 leaves) ---
+    const merkleRoot = await hz_computeMerkleRoot(stmtForMerkle);
 
-    var license = {
-      id: 0,
+    // --- full Statement WITH merkle_root ---
+    const stmt = {
+      license_id: licId,
+      user_id: userId,
+      product_id: productId,
+      volume: volume,
+      duration: duration,
+      merkle_root: merkleRoot,
+      issued_at: issuedAt,
+      expires_at: expiresAt,
+      hardware_id: hwid,
+    };
+
+    // --- CanonicalBytes → SHA-256 → sign ---
+    const msg = hz_canonicalJSON(stmt);
+    const msgBytes = new TextEncoder().encode(msg);
+    const msgHash = await hz_sha256(msgBytes);
+
+    const secp = window.nobleSecp256k1 || window.secp;
+    const sigBytes = secp.sign(msgHash, privateKey).toCompactRawBytes();
+    const sigHex = hz_toHex(sigBytes);
+
+    // --- envelope (what Switch / Backend expects) ---
+    const license = {
       license_id: licId,
       user_id: userId,
       product_id: productId,
@@ -272,116 +412,53 @@ $('genBtn').addEventListener('click', async function() {
       merkle_root: merkleRoot,
       issued_at: issuedAt,
       expires_at: expiresAt,
-      status: status,
-      hardware_id: hwid
+      status: 'active',
+      hardware_id: hwid,
     };
+    lastLicense = license;
 
-    $('result').style.display = 'block';
+    // --- wipe key from RAM ---
+    wipePrivateKey();
+    $('genBtn').disabled = true;
+    $('keyInfo').textContent = '🔒 کلید از RAM پاک شد';
+
+    // --- show result ---
+    $('resultCard').style.display = 'block';
     $('result').textContent = JSON.stringify(license, null, 2);
     $('dlBtn').disabled = false;
-    showStatus('genStatus', 'ok', '✅ لایسنس با موفقیت تولید شد');
-  } catch(err) {
-    showStatus('genStatus', 'err', '❌ خطا: ' + (err.message || err.name || err.toString()));
+    showStatus('genStatus', 'ok', '✅ لایسنس امضا شد · کلید پاک شد');
+  } catch (err) {
+    showStatus('genStatus', 'err', '❌ خطا: ' + (err.message || err.toString()));
   }
 });
 
-// ═══════════════════════════════════════════════
-// Download
-// ═══════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
+// 4. Download .lic
+// ═══════════════════════════════════════════════════════════
 $('dlBtn').addEventListener('click', function() {
-  var content = $('result').textContent;
-  if (!content) return;
-  var licId = $('licId').value.trim();
-  var blob = new Blob([content], { type: 'application/json' });
-  var url = URL.createObjectURL(blob);
-  var a = document.createElement('a');
+  if (!lastLicense) return;
+  const blob = new Blob([JSON.stringify(lastLicense, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
   a.href = url;
-  a.download = licId + '.lic';
+  a.download = (lastLicense.license_id || 'license') + '.lic';
+  document.body.appendChild(a);
   a.click();
+  document.body.removeChild(a);
   URL.revokeObjectURL(url);
-  showStatus('genStatus', 'ok', '💾 فایل دانلود شد: ' + licId + '.lic');
 });
-</script>
 
-<div class="sec">
-  <h2><span class="badge">3.5</span> Verify on Switch</h2>
-  <button id="verifySwitchBtn" class="btn green" type="button">Verify on Switch (v1.4)</button>
-  <div id="verifySwitchStatus" class="status"></div>
-</div>
-
-<script>
-document.getElementById('verifySwitchBtn').addEventListener('click', async function() {
-  var el = document.getElementById('verifySwitchStatus');
-  var rEl = document.getElementById('result');
-  if (!rEl || !rEl.textContent || rEl.textContent.trim() === '') {
-    el.className = 'status err';
-    el.textContent = 'Generate a license first';
-    return;
-  }
-  var j;
-  try { j = JSON.parse(rEl.textContent); } catch (e) {
-    el.className = 'status err';
-    el.textContent = 'Cannot parse result: ' + e.message;
-    return;
-  }
-  var expDate = new Date(j.expires_at * 1000).toISOString().replace(/\.\d{3}Z$/, 'Z');
-  var data = j.license_id + '|' + j.product_id + '|' + j.user_id + '|' + j.volume + '|' + (j.merkle_root || '') + '|' + j.status + '|' + expDate;
-  var payload = {license_id: j.license_id, user_id: j.user_id, signature: j.signature, data: data};
-
-  el.className = 'status info';
-  el.textContent = 'Sending to Switch...';
-
-  try {
-    var r = await fetch('http://localhost:8081/api/v1/license/check', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify(payload)
-    });
-    var res = await r.json();
-    if (res.valid && res.verified) {
-      el.className = 'status ok';
-      el.textContent = 'Switch ACCEPTED - valid=true verified=true';
-    } else {
-      el.className = 'status err';
-      el.textContent = 'Switch REJECTED - ' + (res.error || JSON.stringify(res));
-    }
-  } catch (e) {
-    el.className = 'status err';
-    if (window.location.protocol === 'https:' && (e.message.includes('Failed to fetch') || e.message.includes('NetworkError') || e.message.includes('blocked'))) {
-      el.className = 'status err';
-      el.textContent = 'Mixed content blocked. Browsers cannot call http://localhost from an https:// page. Open this HTML locally: download it and use file:// — or run a local copy via file:///C:/path/to/offline-license.html';
-    } else {
-      el.className = 'status err';
-      el.textContent = 'Cannot reach Switch on localhost:8081 - ' + e.message + ' — make sure Switch is running.';
-    }
+// ═══════════════════════════════════════════════════════════
+// 5. Sanity — warn if library not loaded
+// ═══════════════════════════════════════════════════════════
+window.addEventListener('load', function() {
+  const secp = window.nobleSecp256k1 || window.secp;
+  if (!secp) {
+    showStatus('keyStatus', 'err',
+      '❌ کتابخانه secp256k1 لود نشد. برای air-gap فایل کتابخانه را کنار این HTML بگذار و src را local کن.');
   }
 });
 </script>
 
-
-<script>
-// Defense-in-depth: wipe any retained private key material from the page.
-// Must run after every signing operation and on page unload. This is best-
-// effort — JS engines and GC may still hold copies — but it reduces the
-// window for XSS/extension-based key theft in the tab.
-(function () {
-  function wipeKey() {
-    try {
-      if (typeof privateKey !== 'undefined' && privateKey && typeof privateKey.fill === 'function') {
-        privateKey.fill(0);
-      }
-      if (typeof window.privateKey !== 'undefined' && window.privateKey && typeof window.privateKey.fill === 'function') {
-        window.privateKey.fill(0);
-      }
-      if (typeof window.__hz_privkey !== 'undefined' && window.__hz_privkey && typeof window.__hz_privkey.fill === 'function') {
-        window.__hz_privkey.fill(0);
-      }
-    } catch (e) { /* ignore */ }
-  }
-  window.__hz_wipeKey = wipeKey;
-  window.addEventListener('beforeunload', wipeKey);
-  window.addEventListener('pagehide', wipeKey);
-})();
-</script>
 </body>
 </html>
