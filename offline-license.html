@@ -358,5 +358,30 @@ document.getElementById('verifySwitchBtn').addEventListener('click', async funct
 });
 </script>
 
+
+<script>
+// Defense-in-depth: wipe any retained private key material from the page.
+// Must run after every signing operation and on page unload. This is best-
+// effort — JS engines and GC may still hold copies — but it reduces the
+// window for XSS/extension-based key theft in the tab.
+(function () {
+  function wipeKey() {
+    try {
+      if (typeof privateKey !== 'undefined' && privateKey && typeof privateKey.fill === 'function') {
+        privateKey.fill(0);
+      }
+      if (typeof window.privateKey !== 'undefined' && window.privateKey && typeof window.privateKey.fill === 'function') {
+        window.privateKey.fill(0);
+      }
+      if (typeof window.__hz_privkey !== 'undefined' && window.__hz_privkey && typeof window.__hz_privkey.fill === 'function') {
+        window.__hz_privkey.fill(0);
+      }
+    } catch (e) { /* ignore */ }
+  }
+  window.__hz_wipeKey = wipeKey;
+  window.addEventListener('beforeunload', wipeKey);
+  window.addEventListener('pagehide', wipeKey);
+})();
+</script>
 </body>
 </html>
