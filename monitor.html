@@ -137,6 +137,409 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14
 </style>
 </head>
 <body>
+<!-- HZ-PRICING-STRIP-START -->
+<div id="hz-pricing-strip" style="position:sticky;top:52px;z-index:99;background:var(--bg-2);border-bottom:1px solid var(--border);padding:10px 24px;font-family:var(--mono);font-size:12px;color:var(--text-dim);direction:ltr;text-align:left">
+  <div style="max-width:1400px;margin:0 auto;display:flex;align-items:center;gap:24px;flex-wrap:wrap">
+    <span style="color:var(--blue);font-weight:700">$ horizon@pricing:~</span>
+    <span style="color:var(--text-dimmer)">|</span>
+    <span>tx: <span id="hzp-tx" style="color:var(--yellow);font-weight:700">-</span></span>
+    <span style="color:var(--text-dimmer)">|</span>
+    <span>rate: 1 USD = <span id="hzp-rate" style="color:var(--purple)">-</span> IRT</span>
+    <span style="color:var(--text-dimmer)">|</span>
+    <span id="hzp-status" style="color:var(--text-dimmer)">connecting...</span>
+  </div>
+  <div style="max-width:1400px;margin:8px auto 0;display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px">
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:6px;padding:8px 12px">
+      <div style="color:var(--text-dim);font-size:11px">STANDARD - 20K/tx</div>
+      <div style="color:var(--green);font-size:16px;font-weight:700"><span data-hzp="Standard">-</span> IRT</div>
+      <div style="color:var(--text-dimmer);font-size:11px"><span data-hzp-usd="Standard">-</span></div>
+    </div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:6px;padding:8px 12px">
+      <div style="color:var(--text-dim);font-size:11px">BUSINESS - 30K/tx</div>
+      <div style="color:var(--green);font-size:16px;font-weight:700"><span data-hzp="Business">-</span> IRT</div>
+      <div style="color:var(--text-dimmer);font-size:11px"><span data-hzp-usd="Business">-</span></div>
+    </div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:6px;padding:8px 12px">
+      <div style="color:var(--text-dim);font-size:11px">PREMIUM - 40K/tx</div>
+      <div style="color:var(--green);font-size:16px;font-weight:700"><span data-hzp="Premium">-</span> IRT</div>
+      <div style="color:var(--text-dimmer);font-size:11px"><span data-hzp-usd="Premium">-</span></div>
+    </div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:6px;padding:8px 12px">
+      <div style="color:var(--text-dim);font-size:11px">ENTERPRISE - 50K/tx</div>
+      <div style="color:var(--green);font-size:16px;font-weight:700"><span data-hzp="Enterprise">-</span> IRT</div>
+      <div style="color:var(--text-dimmer);font-size:11px"><span data-hzp-usd="Enterprise">-</span></div>
+    </div>
+  </div>
+</div>
+<script>
+(function(){
+  var BACKEND = 'http://localhost:8080';
+  var fmt = function(n){ return n.toLocaleString('en-US'); };
+  var fmtUSD = function(n){ return '
+
+<!-- ═══ TOP BAR ═══ -->
+<div class="topbar">
+  <div class="topbar-inner">
+    <div class="brand">
+      <div class="brand-mark">H</div>
+      <span class="brand-name">Horizon</span>
+      <span class="brand-sub">Chain Explorer</span>
+    </div>
+    <nav class="nav">
+      <a href="#" class="active">Explorer</a>
+      <a href="offline-license.html">Sign License</a>
+      <a href="proposal.html">Proposal</a>
+      <a href="https://github.com/beaconchain-horizon" target="_blank">GitHub</a>
+    </nav>
+    <input type="text" class="net-url" id="backendUrl" value="http://localhost:8080" placeholder="Backend URL">
+    <button class="net-url" style="width:auto;background:var(--blue);border-color:var(--blue);color:#fff;font-weight:600;cursor:pointer;padding:8px 16px" onclick="connect()">Connect</button>
+    <div class="net-status" id="netStatus">
+      <span class="net-dot" id="netDot" style="background:var(--text-dimmer);box-shadow:none"></span>
+      <span id="netLabel">Offline</span>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- ═══ SEARCH HERO ═══ -->
+  <div class="search-hero">
+    <div class="search-title">Search the chain</div>
+    <div class="search-bar">
+      <input type="text" id="searchQuery" placeholder="Block number, tx_id, public key, or license_id">
+      <button onclick="search()">Search</button>
+    </div>
+  </div>
+
+  <!-- ═══ STATS ═══ -->
+  <div class="stats" id="stats">
+    <div class="stat">
+      <div class="stat-label">Chain ID</div>
+      <div class="stat-value small" id="stChainId">—</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Block Height</div>
+      <div class="stat-value" id="stHeight">—</div>
+      <div class="stat-delta" id="stHeightDelta">—</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Transactions</div>
+      <div class="stat-value" id="stTxTotal">—</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Latest Block Hash</div>
+      <div class="stat-value small" id="stHash">—</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Merkle Root</div>
+      <div class="stat-value small" id="stRoot">—</div>
+    </div>
+  </div>
+
+  <!-- ═══ SEARCH RESULT ═══ -->
+  <div class="result" id="searchResult">
+    <div class="result-header">
+      <span class="badge license" id="resultBadge">—</span>
+      <span class="result-type" id="resultType">Result</span>
+    </div>
+    <div id="resultBody"></div>
+  </div>
+
+  <!-- ═══ PANELS ═══ -->
+  <div class="panels">
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title"><span class="dot"></span>Latest Blocks</div>
+        <a class="panel-action" onclick="loadBlocks()">↻ Refresh</a>
+      </div>
+      <div class="panel-body" id="blocksList">
+        <div class="state"><div class="spinner"></div>Waiting for connection...</div>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title"><span class="dot" style="background:var(--green);box-shadow:0 0 8px var(--green)"></span>Latest Transactions</div>
+        <a class="panel-action" onclick="loadRecentTxs()">↻ Refresh</a>
+      </div>
+      <div class="panel-body" id="txsList">
+        <div class="state"><div class="spinner"></div>Waiting for connection...</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="footer">
+  © 2026 Horizon Core · Chain Explorer v1.4 · <a href="https://github.com/beaconchain-horizon" target="_blank">github.com/beaconchain-horizon</a>
+</div>
+
+<div class="toast" id="toast"><span id="toastMsg"></span></div>
+
+<script>
+let BACKEND = 'http://localhost:8080';
+let lastHeight = 0;
+let refreshTimer = null;
+
+function toast(msg, type = 'ok') {
+  const t = document.getElementById('toast');
+  t.className = 'toast show ' + type;
+  document.getElementById('toastMsg').textContent = msg;
+  setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+function setNet(online) {
+  const dot = document.getElementById('netDot');
+  const lbl = document.getElementById('netLabel');
+  if (online) {
+    dot.style.background = 'var(--green)';
+    dot.style.boxShadow = '0 0 12px var(--green)';
+    lbl.textContent = 'Online';
+    lbl.style.color = 'var(--green)';
+  } else {
+    dot.style.background = 'var(--text-dimmer)';
+    dot.style.boxShadow = 'none';
+    lbl.textContent = 'Offline';
+    lbl.style.color = 'var(--text-dimmer)';
+  }
+}
+
+async function api(path) {
+  const r = await fetch(BACKEND + path);
+  if (!r.ok) throw new Error('HTTP ' + r.status);
+  return r.json();
+}
+
+function shortHash(h, n = 8) {
+  if (!h) return '—';
+  return h.slice(0, n) + '…' + h.slice(-4);
+}
+
+function relativeTime(ts) {
+  const now = Date.now();
+  const t = new Date(ts).getTime();
+  const d = Math.floor((now - t) / 1000);
+  if (d < 5) return 'just now';
+  if (d < 60) return d + 's ago';
+  if (d < 3600) return Math.floor(d / 60) + 'm ago';
+  if (d < 86400) return Math.floor(d / 3600) + 'h ago';
+  return Math.floor(d / 86400) + 'd ago';
+}
+
+function formatTs(ts) {
+  return new Date(ts).toISOString().replace('T', ' ').slice(0, 19);
+}
+
+function copyToClipboard(text) {
+  navigator.clipboard.writeText(text);
+  toast('Copied to clipboard');
+}
+
+async function connect() {
+  BACKEND = document.getElementById('backendUrl').value.trim().replace(/\/$/, '');
+  try {
+    const info = await api('/api/v1/chain/info');
+    setNet(true);
+    toast('Connected · ' + info.chain_id);
+    renderStats(info);
+    document.getElementById('searchResult').classList.remove('show');
+    await loadBlocks();
+    await loadRecentTxs();
+    // Auto refresh every 15s
+    if (refreshTimer) clearInterval(refreshTimer);
+    refreshTimer = setInterval(async () => {
+      try {
+        const info = await api('/api/v1/chain/info');
+        renderStats(info);
+        if (info.height !== lastHeight) {
+          lastHeight = info.height;
+          await loadBlocks();
+          await loadRecentTxs();
+        }
+      } catch (e) { setNet(false); }
+    }, 15000);
+  } catch (e) {
+    setNet(false);
+    toast('Connection failed: ' + e.message, 'err');
+  }
+}
+
+function renderStats(info) {
+  document.getElementById('stChainId').textContent = info.chain_id;
+  document.getElementById('stHeight').textContent = info.height;
+  document.getElementById('stTxTotal').textContent = info.tx_total;
+  document.getElementById('stHash').textContent = shortHash(info.latest_hash, 10);
+  document.getElementById('stHash').title = info.latest_hash;
+  document.getElementById('stHash').onclick = () => copyToClipboard(info.latest_hash);
+  document.getElementById('stRoot').textContent = shortHash(info.latest_root, 10);
+  document.getElementById('stRoot').title = info.latest_root;
+  document.getElementById('stRoot').onclick = () => copyToClipboard(info.latest_root);
+  document.getElementById('stHeightDelta').textContent = 'block time ~30s';
+  document.getElementById('stHeightDelta').className = 'stat-delta blue';
+  lastHeight = info.height;
+}
+
+async function loadBlocks() {
+  const el = document.getElementById('blocksList');
+  try {
+    const data = await api('/api/v1/blocks?limit=15');
+    const blocks = data.blocks || [];
+    if (!blocks.length) { el.innerHTML = '<div class="state">No blocks yet</div>'; return; }
+    let html = '<table class="tbl"><thead><tr><th>Block</th><th>Age</th><th>Txns</th><th>Merkle Root</th></tr></thead><tbody>';
+    for (const b of blocks) {
+      const type = b.number === 0 ? '<span class="badge genesis">genesis</span>' : '';
+      html += '<tr>' +
+        '<td><a class="num" onclick="searchBlock(' + b.number + ')">#' + b.number + '</a> ' + type + '</td>' +
+        '<td><span class="time">' + relativeTime(b.timestamp) + '</span><span class="time-abs">' + formatTs(b.timestamp) + '</span></td>' +
+        '<td class="mono">' + b.tx_count + '</td>' +
+        '<td><span class="hash" onclick="copyToClipboard(\'' + b.merkle_root + '\')" title="' + b.merkle_root + '">' + shortHash(b.merkle_root) + '</span></td>' +
+        '</tr>';
+    }
+    html += '</tbody></table>';
+    el.innerHTML = html;
+  } catch (e) {
+    el.innerHTML = '<div class="state">Error: ' + e.message + '</div>';
+  }
+}
+
+async function loadRecentTxs() {
+  const el = document.getElementById('txsList');
+  try {
+    const data = await api('/api/v1/blocks?limit=5');
+    const blocks = data.blocks || [];
+    let allTxs = [];
+    for (const b of blocks) {
+      const d = await api('/api/v1/blocks/' + b.number);
+      if (d.transactions) allTxs = allTxs.concat(d.transactions);
+    }
+    if (!allTxs.length) { el.innerHTML = '<div class="state">No transactions yet</div>'; return; }
+    let html = '<table class="tbl"><thead><tr><th>TX ID</th><th>Type</th><th>Age</th><th>Block</th></tr></thead><tbody>';
+    for (const t of allTxs) {
+      const cls = t.tx_type.replace('_', '-').replace('license-issue', 'license').replace('license-revoke', 'revoke').replace('sensor-reading', 'sensor');
+      const badgeClass = t.tx_type === 'license_issue' ? 'license' : t.tx_type === 'license_revoke' ? 'revoke' : t.tx_type === 'operation' ? 'operation' : 'sensor';
+      const label = t.tx_type === 'license_issue' ? 'License' : t.tx_type === 'license_revoke' ? 'Revoke' : t.tx_type;
+      html += '<tr>' +
+        '<td><span class="hash" onclick="searchTx(\'' + t.tx_id + '\')" title="' + t.tx_id + '">' + shortHash(t.tx_id, 10) + '</span></td>' +
+        '<td><span class="badge ' + badgeClass + '">' + label + '</span></td>' +
+        '<td><span class="time">' + relativeTime(t.timestamp) + '</span></td>' +
+        '<td><a class="num" onclick="searchBlock(' + t.block_number + ')">#' + t.block_number + '</a></td>' +
+        '</tr>';
+    }
+    html += '</tbody></table>';
+    el.innerHTML = html;
+  } catch (e) {
+    el.innerHTML = '<div class="state">Error: ' + e.message + '</div>';
+  }
+}
+
+async function search() {
+  const q = document.getElementById('searchQuery').value.trim();
+  if (!q) return;
+  const res = document.getElementById('searchResult');
+  try {
+    if (/^\d+$/.test(q)) {
+      const data = await api('/api/v1/blocks/' + q);
+      showBlockResult(data);
+    } else {
+      const tx = await api('/api/v1/transactions/' + q);
+      showTxResult(tx);
+    }
+    res.classList.add('show');
+    res.scrollIntoView({behavior: 'smooth', block: 'nearest'});
+  } catch (e) {
+    toast('Not found: ' + e.message, 'err');
+    res.classList.remove('show');
+  }
+}
+
+function searchBlock(n) {
+  document.getElementById('searchQuery').value = n;
+  search();
+}
+
+function searchTx(id) {
+  document.getElementById('searchQuery').value = id;
+  search();
+}
+
+function showBlockResult(data) {
+  const b = data.block;
+  document.getElementById('resultBadge').className = 'badge ' + (b.number === 0 ? 'genesis' : 'license');
+  document.getElementById('resultBadge').textContent = b.number === 0 ? 'Genesis Block' : 'Block';
+  document.getElementById('resultType').textContent = '#' + b.number;
+  let html = '<dl class="result-grid">';
+  html += '<dt>Block Number</dt><dd class="mono-lg">' + b.number + '</dd>';
+  html += '<dt>Timestamp (UTC)</dt><dd>' + formatTs(b.timestamp) + '</dd>';
+  html += '<dt>Transactions</dt><dd>' + b.tx_count + '</dd>';
+  html += '<dt>Merkle Type</dt><dd>' + b.merkle_type + '</dd>';
+  html += '<dt>Merkle Root</dt><dd style="cursor:pointer" onclick="copyToClipboard(\'' + b.merkle_root + '\')">' + b.merkle_root + '</dd>';
+  html += '<dt>Block Hash</dt><dd style="cursor:pointer" onclick="copyToClipboard(\'' + b.block_hash + '\')">' + b.block_hash + '</dd>';
+  html += '<dt>Previous Hash</dt><dd>' + b.previous_hash + '</dd>';
+  if (data.transactions && data.transactions.length) {
+    html += '<dt>Transactions</dt><dd>';
+    for (const t of data.transactions) {
+      html += '<div style="margin:4px 0"><span class="badge ' + (t.tx_type === 'license_issue' ? 'license' : 'sensor') + '">' + t.tx_type + '</span> ' +
+        '<span style="cursor:pointer;color:var(--blue)" onclick="searchTx(\'' + t.tx_id + '\')">' + t.tx_id + '</span></div>';
+    }
+    html += '</dd>';
+  }
+  html += '</dl>';
+  document.getElementById('resultBody').innerHTML = html;
+}
+
+function showTxResult(t) {
+  const badgeClass = t.tx_type === 'license_issue' ? 'license' : t.tx_type === 'license_revoke' ? 'revoke' : t.tx_type === 'operation' ? 'operation' : 'sensor';
+  document.getElementById('resultBadge').className = 'badge ' + badgeClass;
+  document.getElementById('resultBadge').textContent = t.tx_type;
+  document.getElementById('resultType').textContent = 'Transaction';
+  let html = '<dl class="result-grid">';
+  html += '<dt>TX ID</dt><dd style="cursor:pointer" onclick="copyToClipboard(\'' + t.tx_id + '\')">' + t.tx_id + '</dd>';
+  html += '<dt>Block</dt><dd><a class="num" onclick="searchBlock(' + t.block_number + ')">#' + t.block_number + '</a></dd>';
+  html += '<dt>Index in block</dt><dd>' + t.tx_index + '</dd>';
+  html += '<dt>Timestamp (UTC)</dt><dd>' + formatTs(t.timestamp) + '</dd>';
+  html += '<dt>Payload</dt><dd>' + t.payload + '</dd>';
+  html += '<dt>Signature</dt><dd style="cursor:pointer" onclick="copyToClipboard(\'' + t.signature + '\')">' + t.signature + '</dd>';
+  html += '<dt>Public Key</dt><dd style="cursor:pointer" onclick="copyToClipboard(\'' + t.public_key + '\')">' + t.public_key + '</dd>';
+  html += '<dt>Merkle Leaf</dt><dd>' + t.merkle_leaf + '</dd>';
+  html += '<dt>Merkle Proof</dt><dd style="font-size:11px">' + (t.merkle_proof || '[]') + '</dd>';
+  html += '</dl>';
+  document.getElementById('resultBody').innerHTML = html;
+}
+
+window.addEventListener('load', () => connect());
+</script>
+</body>
+</html> + n.toLocaleString('en-US', {maximumFractionDigits: 0}); };
+
+  function refresh(){
+    var st = document.getElementById('hzp-status');
+    fetch(BACKEND + '/api/v1/pricing/live')
+      .then(function(r){
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        return r.json();
+      })
+      .then(function(data){
+        document.getElementById('hzp-tx').textContent = fmt(data.transactions || 0);
+        document.getElementById('hzp-rate').textContent = fmt(data.exchange_rate || 0);
+        (data.results || []).forEach(function(row){
+          var el = document.querySelector('[data-hzp="' + row.tier + '"]');
+          if (el) el.textContent = fmt(row.total_toman);
+          var elUsd = document.querySelector('[data-hzp-usd="' + row.tier + '"]');
+          if (elUsd) elUsd.textContent = fmtUSD(row.total_usd);
+        });
+        st.textContent = 'live - chain ' + data.chain_id + ' - height ' + data.height;
+        st.style.color = 'var(--green)';
+      })
+      .catch(function(){
+        st.textContent = 'offline - backend not reachable';
+        st.style.color = 'var(--red)';
+      });
+  }
+  refresh();
+  setInterval(refresh, 5000);
+})();
+</script>
+<!-- HZ-PRICING-STRIP-END -->
+
 
 <!-- ═══ TOP BAR ═══ -->
 <div class="topbar">
