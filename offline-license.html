@@ -228,6 +228,29 @@ $('volume').addEventListener('change', function(e) {
 // ═══════════════════════════════════════════════
 // Generate license
 // ═══════════════════════════════════════════════
+// --- merkle helper ---
+async function _hz_sha256(b) {
+  return new Uint8Array(await crypto.subtle.digest("SHA-256", b));
+}
+async function _hz_merkleRoot(st) {
+  var e = new TextEncoder();
+  var L = ["license_id="+st.license_id,"user_id="+st.user_id,"product_id="+st.product_id,"volume="+st.volume,"duration="+st.duration,"issued_at="+st.issued_at,"expires_at="+st.expires_at,"hardware_id="+st.hardware_id];
+  var h = [];
+  for (var i=0;i<L.length;i++) h.push(await _hz_sha256(e.encode(L[i])));
+  while (h.length > 1) {
+    var n = [];
+    for (var i=0;i<h.length;i+=2) {
+      var a = h[i], b = (i+1<h.length) ? h[i+1] : h[i];
+      var p = new Uint8Array(a.length + b.length);
+      p.set(a,0); p.set(b,a.length);
+      n.push(await _hz_sha256(p));
+    }
+    h = n;
+  }
+  return Array.from(h[0]).map(function(x){return x.toString(16).padStart(2,"0");}).join("");
+}
+// --- end merkle helper ---
+
 $('genBtn').addEventListener('click', async function() {
   if (!privateKey) {
     showStatus('genStatus', 'err', '❌ اول کلید را بارگذاری کن');
@@ -249,11 +272,11 @@ $('genBtn').addEventListener('click', async function() {
 
     var issuedAt = Math.floor(Date.now() / 1000);
     var expiresAt = issuedAt + (duration * 86400);
-    var merkleRoot = '';
+    var merkleRoot = await _hz_merkleRoot({license_id:licId, user_id:userId, product_id:productId, volume:volume, duration:duration, issued_at:issuedAt, expires_at:expiresAt, hardware_id:hwid});
     var status = 'active';
 
     var expDate = new Date(expiresAt * 1000).toISOString().replace(/\.\d{3}Z$/, 'Z');
-    var msg = licId + '|' + productId + '|' + userId + '|' + volume + '|' + merkleRoot + '|' + status + '|' + expDate;
+    var msg = JSON.stringify({license_id:licId, user_id:userId, product_id:productId, volume:volume, duration:duration, merkle_root:merkleRoot, issued_at:issuedAt, expires_at:expiresAt, hardware_id:hwid});
 
     var msgBytes = new TextEncoder().encode(msg);
     var msgHash = new Uint8Array(await crypto.subtle.digest('SHA-256', msgBytes));
