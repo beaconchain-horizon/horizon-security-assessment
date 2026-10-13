@@ -383,6 +383,444 @@ footer .logo .mark{
 </style>
 </head>
 <body>
+<!-- HORIZON-TERMINAL-BAR-START -->
+<div id="hz-terminal-bar" style="
+  position:sticky;top:0;z-index:10000;
+  background:#0a0e1a;
+  border-bottom:2px solid #4f9eff;
+  padding:10px 16px;
+  font-family:'Consolas','Monaco','Courier New',monospace;
+  font-size:13px;
+  color:#4ade80;
+  direction:ltr;
+  text-align:left;
+  box-shadow:0 4px 20px rgba(0,0,0,.5);
+">
+  <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;max-width:1400px;margin:0 auto">
+    <span style="color:#4f9eff;font-weight:bold">$ horizon@pricing:~</span>
+    <span style="color:#8892a8">|</span>
+    <span style="color:#8892a8">transactions:</span>
+    <span id="hz-tx-count" style="color:#eab308;font-weight:bold">—</span>
+    <span style="color:#8892a8">|</span>
+    <span style="color:#8892a8">rate:</span>
+    <span style="color:#c084fc">1 USD = <span id="hz-usd-rate">—</span> IRT</span>
+    <span style="color:#8892a8">|</span>
+    <span id="hz-live-status" style="color:#8892a8">connecting...</span>
+  </div>
+  <div id="hz-pricing-row" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;max-width:1400px;margin:8px auto 0">
+    <div style="background:#121a3a;border:1px solid #1e2a52;border-radius:6px;padding:8px 12px">
+      <div style="color:#8892a8;font-size:11px">STANDARD · 20K/tx</div>
+      <div style="color:#4ade80;font-size:16px;font-weight:bold"><span data-tier="Standard">—</span> IRT</div>
+      <div style="color:#5a6382;font-size:11px"><span data-tier-usd="Standard">—</span></div>
+    </div>
+    <div style="background:#121a3a;border:1px solid #1e2a52;border-radius:6px;padding:8px 12px">
+      <div style="color:#8892a8;font-size:11px">BUSINESS · 30K/tx</div>
+      <div style="color:#4ade80;font-size:16px;font-weight:bold"><span data-tier="Business">—</span> IRT</div>
+      <div style="color:#5a6382;font-size:11px"><span data-tier-usd="Business">—</span></div>
+    </div>
+    <div style="background:#121a3a;border:1px solid #1e2a52;border-radius:6px;padding:8px 12px">
+      <div style="color:#8892a8;font-size:11px">PREMIUM · 40K/tx</div>
+      <div style="color:#4ade80;font-size:16px;font-weight:bold"><span data-tier="Premium">—</span> IRT</div>
+      <div style="color:#5a6382;font-size:11px"><span data-tier-usd="Premium">—</span></div>
+    </div>
+    <div style="background:#121a3a;border:1px solid #1e2a52;border-radius:6px;padding:8px 12px">
+      <div style="color:#8892a8;font-size:11px">ENTERPRISE · 50K/tx</div>
+      <div style="color:#4ade80;font-size:16px;font-weight:bold"><span data-tier="Enterprise">—</span> IRT</div>
+      <div style="color:#5c6382;font-size:11px"><span data-tier-usd="Enterprise">—</span></div>
+    </div>
+  </div>
+</div>
+<script>
+(function(){
+  var BACKEND = 'http://localhost:8080';
+  var fmt = function(n){ return n.toLocaleString('en-US'); };
+  var fmtUSD = function(n){ return '
+<!-- v1.4-banner-start -->
+<div style="position:fixed;top:0;left:0;right:0;z-index:9999;background:linear-gradient(90deg,#0a1628,#1a2942);border-bottom:1px solid #4f9eff;padding:8px 16px;text-align:center;font-family:Tahoma,sans-serif;font-size:13px;color:#eef2ff;direction:rtl">
+  <span style="background:linear-gradient(135deg,#4f9eff,#c084fc);color:#fff;padding:2px 10px;border-radius:12px;font-weight:700;font-size:11px">v1.4</span>
+  <span style="margin:0 8px">سیستم جدید · secp256k1 · </span>
+  <a href="offline-license.html" style="color:#4ade80;font-weight:700;text-decoration:none">🔑 Offline Signer</a>
+  <span style="margin:0 8px">·</span>
+  <a href="https://github.com/beaconchain-horizon/horizon-core" style="color:#4f9eff;text-decoration:none">GitHub</a>
+  <span style="margin:0 8px">·</span>
+  <a href="https://github.com/beaconchain-horizon/horizon-core/blob/main/docs/CRYPTO-CONTRACT.md" style="color:#8fa2dc;text-decoration:none">Crypto Contract</a>
+</div>
+<div style="height:44px"></div>
+<!-- v1.4-banner-end -->
+
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-logo">
+    <span class="mark">◆</span>
+    Horizon
+  </div>
+  <div class="nav-links">
+    <a href="#features">ویژگی‌ها</a>
+    <a href="#products">پلن‌ها</a>
+    <a href="#calc">ماشین‌حساب</a>
+    <a href="#network">شبکه</a>
+    <a href="#clients">مشتریان</a>
+  </div>
+  <div class="nav-actions">
+    <button class="nav-login">ورود</button>
+    <button class="nav-signup">شروع کنید</button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-inner">
+    <div>
+      <h1>
+        زیرساخت بلاکچین<br>
+        برای <span>صنایع حیاتی</span>
+      </h1>
+      <p>
+        پلتفرم لایسنس‌دهی امن با امضای ECDSA و Merkle Proof.
+        آفلاین-اول، مقاوم در برابر قطعی اینترنت، مناسب بانک‌ها و صنایع.
+      </p>
+      <div class="hero-btns">
+        <button class="btn-primary">شروع رایگان</button>
+        <button class="btn-ghost">مشاهده دمو</button>
+      </div>
+    </div>
+    <div class="term">
+      <div class="term-bar">
+        <div class="term-dot r"></div>
+        <div class="term-dot y"></div>
+        <div class="term-dot g"></div>
+      </div>
+      <div class="term-line"><span class="dim">$</span> <span class="cmd">horizon</span> license issue --customer bank-melli</div>
+      <div class="term-line"><span class="ok">✓</span> key unlocked from USB</div>
+      <div class="term-line"><span class="ok">✓</span> ECDSA signed <span class="val">2dd01e28...c53</span></div>
+      <div class="term-line"><span class="ok">✓</span> block <span class="val">#26</span> mined</div>
+      <div class="term-line"><span class="ok">✓</span> merkle root <span class="val">0x789abc...</span></div>
+      <div class="term-line" style="margin-top:12px"><span class="dim">→</span> license saved: <span class="val">HZ-2026-001.lic</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<section class="stats-bar">
+  <div class="stats-inner">
+    <div class="stat-cell">
+      <div class="stat-val">35,938</div>
+      <div class="stat-lbl">حداکثر TPS</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-val">0</div>
+      <div class="stat-lbl">خطا در بنچمارک</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-val">&lt;1ms</div>
+      <div class="stat-lbl">امضای ECDSA</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-val">99.98%</div>
+      <div class="stat-lbl">آپ‌تایم</div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="section" id="features">
+  <div class="section-inner">
+    <div class="section-head">
+      <div class="eyebrow">ویژگی‌ها</div>
+      <h2>ساخته‌شده برای سخت‌ترین شرایط</h2>
+      <p>زیرساختی که برای محیط‌های حیاتی طراحی شده — از بانکداری تا صنایع سنگین.</p>
+    </div>
+    <div class="feat-grid">
+      <div class="feat-card">
+        <div class="feat-icon">🔐</div>
+        <h3>امضای ECDSA P-256</h3>
+        <p>هر تراکنش با امضای رمزنگاری‌شده ثبت می‌شود. کلید خصوصی هرگز از USB خارج نمی‌شود.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">🌳</div>
+        <h3>Merkle Tree Proof</h3>
+        <p>اثبات‌پذیری هر تراکنش با درخت مرکل. غیرقابل دستکاری، قابل تأیید مستقل.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">📡</div>
+        <h3>آفلاین-اول</h3>
+        <p>کار کامل در حالت قطع اینترنت. سینک خودکار هنگام بازگشت اتصال.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">🛡️</div>
+        <h3>Air-Gap Ready</h3>
+        <p>قابل استقرار در محیط‌های کاملاً ایزوله. مناسب زیرساخت‌های حیاتی.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">⚡</div>
+        <h3>عملکرد اثبات‌شده</h3>
+        <p>بیش از ۳۱٬۰۰۰ TPS با صفر خطا در بنچمارک عمومی و قابل تأیید مستقل.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">🏢</div>
+        <h3>Multi-Tenant</h3>
+        <p>معماری چند-مستأجری برای بانک‌ها، صنایع و سازمان‌های بزرگ.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRODUCTS -->
+<section class="section products-section" id="products">
+  <div class="section-inner">
+    <div class="section-head">
+      <div class="eyebrow">پلن‌ها</div>
+      <h2>قیمت‌گذاری شفاف</h2>
+      <p>پرداخت بر اساس حجم تراکنش. بدون هزینه پنهان، بدون غافلگیری.</p>
+    </div>
+    <div class="prod-grid">
+
+      <div class="prod-card">
+        <div class="prod-tier">STANDARD</div>
+        <div class="prod-name">پایه</div>
+        <div class="prod-price">۵۰ <span class="cur">تومان</span></div>
+        <div class="prod-unit">به ازای هر تراکنش</div>
+        <ul class="prod-list">
+          <li>تا ۵۰ میلیون تراکنش</li>
+          <li>اشتراک پایه ۵۰M تومان</li>
+          <li>۳۶۵ روز اعتبار</li>
+          <li>پشتیبانی استاندارد</li>
+        </ul>
+        <button class="prod-btn">خرید لایسنس</button>
+      </div>
+
+      <div class="prod-card">
+        <div class="prod-tier">PROFESSIONAL</div>
+        <div class="prod-name">حرفه‌ای</div>
+        <div class="prod-price">۴۰ <span class="cur">تومان</span></div>
+        <div class="prod-unit">به ازای هر تراکنش</div>
+        <ul class="prod-list">
+          <li>تا ۱۰۰ میلیون تراکنش</li>
+          <li>اشتراک پایه ۱۰۰M تومان</li>
+          <li>۳۶۵ روز اعتبار</li>
+          <li>پشتیبانی اولویت‌دار</li>
+        </ul>
+        <button class="prod-btn">خرید لایسنس</button>
+      </div>
+
+      <div class="prod-card pop">
+        <div class="pop-badge">پرفروش</div>
+        <div class="prod-tier">ENTERPRISE</div>
+        <div class="prod-name">سازمانی</div>
+        <div class="prod-price">۳۰ <span class="cur">تومان</span></div>
+        <div class="prod-unit">به ازای هر تراکنش</div>
+        <ul class="prod-list">
+          <li>تا ۲۰۰ میلیون تراکنش</li>
+          <li>اشتراک پایه ۲۰۰M تومان</li>
+          <li>۳۶۵ روز اعتبار</li>
+          <li>پشتیبانی ۲۴/۷</li>
+          <li>Air-Gap Mode</li>
+        </ul>
+        <button class="prod-btn">خرید لایسنس</button>
+      </div>
+
+      <div class="prod-card">
+        <div class="prod-tier">SOVEREIGN</div>
+        <div class="prod-name">حاکمیتی</div>
+        <div class="prod-price">۲۰ <span class="cur">تومان</span></div>
+        <div class="prod-unit">به ازای هر تراکنش</div>
+        <ul class="prod-list">
+          <li>بدون محدودیت حجم</li>
+          <li>اشتراک پایه ۵۰۰M تومان</li>
+          <li>اعتبار سفارشی</li>
+          <li>تیم اختصاصی</li>
+          <li>استقرار On-Premise</li>
+        </ul>
+        <button class="prod-btn">تماس با ما</button>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- CALCULATOR -->
+<section class="calc-section" id="calc">
+  <div class="calc-inner">
+    <div class="calc-text">
+      <h2>هزینه لایسنس خود را محاسبه کنید</h2>
+      <p>
+        حجم و مدت مورد نیاز خود را انتخاب کنید. قیمت به‌صورت لحظه‌ای محاسبه می‌شود.
+        بدون نیاز به ثبت‌نام.
+      </p>
+    </div>
+    <div class="calc-box">
+      <div class="calc-row">
+        <label>سطح لایسنس</label>
+        <select id="tier">
+          <option value="standard">Standard — ۵۰ تومان/تراکنش</option>
+          <option value="professional">Professional — ۴۰ تومان/تراکنش</option>
+          <option value="enterprise" selected>Enterprise — ۳۰ تومان/تراکنش</option>
+          <option value="sovereign">Sovereign — ۲۰ تومان/تراکنش</option>
+        </select>
+      </div>
+      <div class="calc-row">
+        <label>حجم (میلیون تراکنش)</label>
+        <input type="number" id="vol" value="50" min="1" max="10000">
+      </div>
+      <div class="calc-row">
+        <label>مدت (روز)</label>
+        <input type="number" id="days" value="365" min="30" max="3650">
+      </div>
+      <div class="calc-result">
+        <div class="calc-result-label">هزینه کل</div>
+        <div class="calc-result-val" id="total">۰ <span class="cur">تومان</span></div>
+        <div class="calc-detail" id="detail"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- NETWORK -->
+<section class="section blocks-section" id="network">
+  <div class="section-inner">
+    <div class="section-head">
+      <div class="eyebrow">شبکه زنده</div>
+      <h2>آخرین بلوک‌های بلاکچین</h2>
+      <p>بلوک‌های واقعی با امضای ECDSA و Merkle Proof، به‌روزرسانی لحظه‌ای.</p>
+    </div>
+    <div class="blocks-grid">
+      <div class="block-card genesis">
+        <div class="block-idx">#0</div>
+        <div class="block-tag">GENESIS</div>
+        <div class="block-hash">9b1976ddb9c279ee257c828f9ea6de30c1...</div>
+        <div class="block-meta"><span>۰ تراکنش</span><span>شروع</span></div>
+      </div>
+      <div class="block-card">
+        <div class="block-idx">#1</div>
+        <div class="block-hash">94829fa6c37ec23ac3bd6681f6a2b8e4c1...</div>
+        <div class="block-meta"><span>۳ تراکنش</span><span>Merkle ✓</span></div>
+      </div>
+      <div class="block-card">
+        <div class="block-idx">#2</div>
+        <div class="block-hash">8247b1838140ccbeb907fd7193c5f7e2a9...</div>
+        <div class="block-meta"><span>۳ تراکنش</span><span>Merkle ✓</span></div>
+      </div>
+      <div class="block-card">
+        <div class="block-idx">#3</div>
+        <div class="block-hash">c85838c1beb5602bf960275b4a8d6f1c7e...</div>
+        <div class="block-meta"><span>۱ تراکنش</span><span>همگام‌شده</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CLIENTS -->
+<section class="section clients-section" id="clients">
+  <div class="section-inner">
+    <div class="section-head">
+      <div class="eyebrow">مشتریان</div>
+      <h2>صنایع هدف ما</h2>
+      <p>راه‌حل Horizon برای سازمان‌های زیر طراحی شده — در حال جذب اولین مشتریان پایلوت.</p>
+    </div>
+    <div class="clients-grid">
+      <div class="client-card"><div class="client-icon">🏦</div><div class="client-name">بانکداری</div><div class="client-type">بانکداری</div></div>
+      <div class="client-card"><div class="client-icon">🛢️</div><div class="client-name">صنایع نفت و گاز</div><div class="client-type">صنعت نفت</div></div>
+      <div class="client-card"><div class="client-icon">⚡</div><div class="client-name">مدیریت برق</div><div class="client-type">صنعت برق</div></div>
+      <div class="client-card"><div class="client-icon">🏗️</div><div class="client-name">صنعت فولاد</div><div class="client-type">صنعت فولاد</div></div>
+      <div class="client-card"><div class="client-icon">🥉</div><div class="client-name">صنعت مس</div><div class="client-type">معدن و مس</div></div>
+      <div class="client-card"><div class="client-icon">🏭</div><div class="client-name">پالایشگاه‌ها</div><div class="client-type">صنعت نفت</div></div>
+      <div class="client-card"><div class="client-icon">⛽</div><div class="client-name">صنعت گاز</div><div class="client-type">صنعت گاز</div></div>
+      <div class="client-card"><div class="client-icon">🛢️</div><div class="client-name">پالایش نفت</div><div class="client-type">صنعت نفت</div></div>
+      <div class="client-card"><div class="client-icon">⚡</div><div class="client-name">مدیریت برق</div><div class="client-type">صنعت برق</div></div>
+      <div class="client-card"><div class="client-icon">🥉</div><div class="client-name">صنایع معدنی</div><div class="client-type">معدن و مس</div></div>
+      <div class="client-card"><div class="client-icon">🏗️</div><div class="client-name">صنایع فلزی</div><div class="client-type">صنعت فولاد</div></div>
+      <div class="client-card"><div class="client-icon">🏭</div><div class="client-name">صنایع پتروشیمی</div><div class="client-type">پتروشیمی</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta">
+  <h2>آماده شروع هستید؟</h2>
+  <p>تیم Horizon آماده ارائه دمو و مشاوره رایگان برای سازمان شماست.</p>
+  <button class="cta-btn">درخواست دمو رایگان</button>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="logo">
+    <span class="mark">◆</span> Horizon
+  </div>
+  <div>© ۲۰۲۶ Horizon — بلاکچین اختصاصی ایران</div>
+  <div style="margin-top:8px;font-size:12px;opacity:0.5">طراحی و توسعه: مهدی آملی مقدم</div>
+</footer>
+
+<script>
+// ============ CALCULATOR ============
+const PRICES = {
+  standard:     { perTx: 50, sub: 50_000_000 },
+  professional: { perTx: 40, sub: 100_000_000 },
+  enterprise:   { perTx: 30, sub: 200_000_000 },
+  sovereign:    { perTx: 20, sub: 500_000_000 }
+};
+
+function fmt(n) {
+  return Number(n).toLocaleString('fa-IR');
+}
+
+function calc() {
+  const tier = document.getElementById('tier').value;
+  const vol = parseInt(document.getElementById('vol').value) || 0;
+  const days = parseInt(document.getElementById('days').value) || 0;
+  const p = PRICES[tier];
+  const txCost = vol * 1_000_000 * p.perTx;
+  const total = txCost + p.sub;
+
+  document.getElementById('total').innerHTML =
+    fmt(total) + ' <span class="cur">تومان</span>';
+
+  document.getElementById('detail').innerHTML =
+    'هزینه تراکنش: ' + fmt(txCost) + ' تومان<br>' +
+    'اشتراک پایه: ' + fmt(p.sub) + ' تومان<br>' +
+    'نرخ هر تراکنش: ' + p.perTx + ' تومان — مدت: ' + days + ' روز';
+}
+
+document.getElementById('tier').addEventListener('change', calc);
+document.getElementById('vol').addEventListener('input', calc);
+document.getElementById('days').addEventListener('input', calc);
+calc();
+</script>
+
+</body>
+</html>
+ + n.toLocaleString('en-US', {maximumFractionDigits: 0}); };
+
+  function refresh(){
+    var st = document.getElementById('hz-live-status');
+    fetch(BACKEND + '/api/v1/pricing/live')
+      .then(function(r){
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        return r.json();
+      })
+      .then(function(data){
+        document.getElementById('hz-tx-count').textContent = fmt(data.transactions);
+        document.getElementById('hz-usd-rate').textContent = fmt(data.exchange_rate);
+        (data.results || []).forEach(function(row){
+          var el = document.querySelector('[data-tier="' + row.tier + '"]');
+          if (el) el.textContent = fmt(row.total_toman);
+          var elUsd = document.querySelector('[data-tier-usd="' + row.tier + '"]');
+          if (elUsd) elUsd.textContent = fmtUSD(row.total_usd);
+        });
+        st.textContent = 'live · chain ' + data.chain_id + ' · height ' + data.height;
+        st.style.color = '#4ade80';
+      })
+      .catch(function(e){
+        st.textContent = 'offline · backend not reachable';
+        st.style.color = '#ef4444';
+      });
+  }
+  refresh();
+  setInterval(refresh, 5000);
+})();
+</script>
+<!-- HORIZON-TERMINAL-BAR-END -->
+
 <!-- v1.4-banner-start -->
 <div style="position:fixed;top:0;left:0;right:0;z-index:9999;background:linear-gradient(90deg,#0a1628,#1a2942);border-bottom:1px solid #4f9eff;padding:8px 16px;text-align:center;font-family:Tahoma,sans-serif;font-size:13px;color:#eef2ff;direction:rtl">
   <span style="background:linear-gradient(135deg,#4f9eff,#c084fc);color:#fff;padding:2px 10px;border-radius:12px;font-weight:700;font-size:11px">v1.4</span>
