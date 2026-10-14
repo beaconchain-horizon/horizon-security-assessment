@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>Horizon Core — Customer License Panel</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  *{box-sizing:border-box}
+  body{font-family:-apple-system,"Segoe UI",Tahoma,sans-serif;background:#0a0e1a;color:#e6edf3;margin:0;padding:24px;line-height:1.7}
+  .wrap{max-width:800px;margin:0 auto}
+  h1{color:#58a6ff;font-size:22px;margin:0 0 4px}
+  .sub{color:#8b949e;font-size:13px;margin-bottom:24px}
+  .card{background:#161b22;border:1px solid #30363d;border-radius:8px;padding:20px;margin-bottom:16px}
+  .card h2{color:#58a6ff;font-size:15px;margin:0 0 14px;font-weight:600}
+  label{display:block;font-size:13px;color:#8b949e;margin:12px 0 4px}
+  input[type=file]{width:100%;padding:8px;background:#0d1117;border:1px solid #30363d;border-radius:6px;color:#e6edf3;font-size:13px}
+  button{background:#238636;color:#fff;border:none;padding:10px 18px;border-radius:6px;font-size:14px;cursor:pointer;font-family:inherit;margin-top:12px}
+  button:disabled{opacity:.5;cursor:not-allowed}
+  button:hover:not(:disabled){background:#2ea043}
+  .status{padding:10px 14px;border-radius:6px;font-size:14px;margin-top:12px;font-weight:600}
+  .status.ok{background:#0d419d33;color:#79c0ff;border:1px solid #1f6feb}
+  .status.err{background:#5d1a1a44;color:#ff7b72;border:1px solid #f85149}
+  .status.info{background:#1f6feb22;color:#58a6ff;border:1px solid #1f6feb}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+  .kv{background:#0d1117;border:1px solid #30363d;border-radius:6px;padding:10px}
+  .kv .k{font-size:11px;color:#8b949e;text-transform:uppercase;letter-spacing:.5px}
+  .kv .v{font-size:14px;color:#e6edf3;margin-top:4px;word-break:break-all;direction:ltr;text-align:left}
+  .check{display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:6px;margin-top:8px;font-size:13px}
+  .check.pass{background:#0d419d22;border:1px solid #1f6feb}
+  .check.fail{background:#5d1a1a33;border:1px solid #f85149}
+  .check .ic{font-size:16px}
+  .badge{display:inline-block;padding:3px 10px;border-radius:12px;font-size:11px;background:#1f6feb33;color:#79c0ff}
+  .row{display:flex;gap:12px;margin-top:12px}
+  .row>*{flex:1}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Horizon Core — Customer License Panel <span class="badge">v2</span></h1>
+  <div class="sub">تأیید آفلاین لایسنس · بدون نیاز به سرور · فقط با کلید عمومی</div>
+
+  <div class="card">
+    <h2>۱. بارگذاری فایل لایسنس (.lic)</h2>
+    <label for="licFile">فایل لایسنس</label>
+    <input type="file" id="licFile" accept=".lic,application/json">
+    <div id="status"></div>
+  </div>
+
+  <div class="card" id="resultCard" style="display:none">
+    <h2>۲. نتیجه تأیید</h2>
+    <div id="verdict"></div>
+
+    <div class="grid" id="details"></div>
+
+    <div id="checks" style="margin-top:14px"></div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@noble/secp256k1@2.1.0/lib/esm/index.min.js"></script>
+<script>
+// ═══════════════════════════════════════════════════════════
+// Verification helpers — must match Go internal/license/protocol.go
+// ═══════════════════════════════════════════════════════════
+
+// Trusted public key — provisioned out of band. Must be the Authority public key.
+const TRUSTED_PUBLIC_KEY_HEX = "cf6aaaba8e7a6fddde63a2e2588553dc95503d2de6b2a5c78f4a30a0b91b0aca4d28d06fc1ccbaf730abe1dcda7c29726dab18008353b521c9253c04b1641214";
+
+async function sha256(bytes) {
+  return new Uint8Array(await crypto.subtle.digest('SHA-256', bytes));
+}
+function toHex(bytes) {
+  return Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+function concat(a, b) {
+  const o = new Uint8Array(a.length + b.length);
+  o.set(a, 0); o.set(b, a.length); return o;
+}
+async function binaryRootNoPrefix(leaves) {
+  if (leaves.length === 0) return new Uint8Array(32);
+  let level = [];
+  for (let i = 0; i < leaves.length; i++) level.push(await sha256(leaves[i]));
+  while (level.length > 1) {
+    const next = [];
+    for (let i = 0; i < level.length; i += 2) {
+      const a = level[i];
+      const b = (i + 1 < level.length) ? level[i + 1] : level[i];
+      next.push(await sha256(concat(a, b)));
+    }
+    level = next;
+  }
+  return level[0];
+}
+async function computeMerkleRoot(st) {
+  const e = new TextEncoder();
+  const leaves = [
+    e.encode('license_id=' + st.license_id),
+    e.encode('user_id=' + st.user_id),
+    e.encode('product_id=' + st.product_id),
+    e.encode('volume=' + st.volume),
+    e.encode('duration=' + st.duration),
+    e.encode('issued_at=' + st.issued_at),
+    e.encode('expires_at=' + st.expires_at),
+    e.encode('hardware_id=' + st.hardware_id),
+  ];
+  return toHex(await binaryRootNoPrefix(leaves));
+}
+function canonicalJSON(st) {
+  return JSON.stringify({
+    license_id:  st.license_id,
+    user_id:     st.user_id,
+    product_id:  st.product_id,
+    volume:      st.volume,
+    duration:    st.duration,
+    merkle_root: st.merkle_root,
+    issued_at:   st.issued_at,
+    expires_at:  st.expires_at,
+    hardware_id: st.hardware_id,
+  });
+}
+function getSecp() {
+  return window.nobleSecp256k1 || window.secp;
+}
+function hexToBytes(hex) {
+  hex = hex.replace(/^0x/i, '');
+  const out = new Uint8Array(hex.length / 2);
+  for (let i = 0; i < out.length; i++) out[i] = parseInt(hex.substr(i * 2, 2), 16);
+  return out;
+}
+
+// ═══════════════════════════════════════════════════════════
+// DOM
+// ═══════════════════════════════════════════════════════════
+const $ = id => document.getElementById(id);
+
+function showStatus(kind, text) {
+  const el = $('status');
+  el.className = 'status ' + kind;
+  el.textContent = text;
+}
+
+function addCheck(container, pass, text) {
+  const d = document.createElement('div');
+  d.className = 'check ' + (pass ? 'pass' : 'fail');
+  d.innerHTML = '<span class="ic">' + (pass ? '✅' : '❌') + '</span><span>' + text + '</span>';
+  container.appendChild(d);
+}
+
+function addKV(container, key, val) {
+  const d = document.createElement('div');
+  d.className = 'kv';
+  d.innerHTML = '<div class="k">' + key + '</div><div class="v">' + val + '</div>';
+  container.appendChild(d);
+}
+
+// ═══════════════════════════════════════════════════════════
+// Main verification
+// ═══════════════════════════════════════════════════════════
+$('licFile').addEventListener('change', async function(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  try {
+    showStatus('info', '⏳ در حال بررسی...');
+
+    const raw = await file.text();
+    const lic = JSON.parse(raw);
+
+    // reset UI
+    $('resultCard').style.display = 'block';
+    $('verdict').innerHTML = '';
+    $('details').innerHTML = '';
+    $('checks').innerHTML = '';
+
+    const checks = $('checks');
+    let allValid = true;
+
+    // --- check 1: merkle_root recompute ---
+    const stmtForMerkle = {
+      license_id: lic.license_id,
+      user_id:    lic.user_id,
+      product_id: lic.product_id,
+      volume:     lic.volume,
+      duration:   lic.duration,
+      issued_at:  lic.issued_at,
+      expires_at: lic.expires_at,
+      hardware_id: lic.hardware_id || '',
+    };
+    const computedRoot = await computeMerkleRoot(stmtForMerkle);
+    if (computedRoot === lic.merkle_root) {
+      addCheck(checks, true, 'Merkle root matches 8 attribute leaves');
+    } else {
+      addCheck(checks, false, 'Merkle root mismatch: computed ' + computedRoot.slice(0,16) + '... vs license ' + (lic.merkle_root || '').slice(0,16) + '...');
+      allValid = false;
+    }
+
+    // --- check 2: signature over canonical JSON ---
+    const secp = getSecp();
+    if (!secp) {
+      addCheck(checks, false, 'secp256k1 library not loaded');
+      allValid = false;
+    } else {
+      const canonical = canonicalJSON({
+        license_id:  lic.license_id,
+        user_id:     lic.user_id,
+        product_id:  lic.product_id,
+        volume:      lic.volume,
+        duration:    lic.duration,
+        merkle_root: lic.merkle_root,
+        issued_at:   lic.issued_at,
+        expires_at:  lic.expires_at,
+        hardware_id: lic.hardware_id || '',
+      });
+      const hash = await sha256(new TextEncoder().encode(canonical));
+      try {
+        const ok = secp.verify(lic.signature, hash, TRUSTED_PUBLIC_KEY_HEX, { lowS: false, prehash: false });
+        if (ok) {
+          addCheck(checks, true, 'ECDSA signature verified against trusted public key');
+        } else {
+          addCheck(checks, false, 'ECDSA signature verification failed');
+          allValid = false;
+        }
+      } catch (err) {
+        addCheck(checks, false, 'Signature check error: ' + err.message);
+        allValid = false;
+      }
+    }
+
+    // --- check 3: expiry ---
+    const now = Math.floor(Date.now() / 1000);
+    if (now < lic.issued_at) {
+      addCheck(checks, false, 'License is not active yet (issued_at in the future)');
+      allValid = false;
+    } else if (now >= lic.expires_at) {
+      addCheck(checks, false, 'License expired');
+      allValid = false;
+    } else {
+      const days = Math.floor((lic.expires_at - now) / 86400);
+      addCheck(checks, true, 'License active — ' + days + ' day(s) remaining');
+    }
+
+    // --- check 4: status field ---
+    if (lic.status === 'active') {
+      addCheck(checks, true, 'Status: active');
+    } else {
+      addCheck(checks, false, 'Status: ' + lic.status);
+      allValid = false;
+    }
+
+    // --- check 5: usage ---
+    const used = lic.used || 0;
+    const remaining = (lic.volume || 0) - used;
+    if (remaining > 0) {
+      addCheck(checks, true, 'Usage: ' + used + ' / ' + lic.volume + ' — remaining: ' + remaining);
+    } else {
+      addCheck(checks, false, 'Usage quota exhausted');
+      allValid = false;
+    }
+
+    // --- details ---
+    addKV($('details'), 'License ID', lic.license_id);
+    addKV($('details'), 'Organization', lic.user_id);
+    addKV($('details'), 'Product', lic.product_id);
+    addKV($('details'), 'Issued', new Date(lic.issued_at * 1000).toISOString().replace('T',' ').slice(0,19) + ' UTC');
+    addKV($('details'), 'Expires', new Date(lic.expires_at * 1000).toISOString().replace('T',' ').slice(0,19) + ' UTC');
+    addKV($('details'), 'Merkle Root', lic.merkle_root);
+    addKV($('details'), 'Hardware ID', lic.hardware_id || '(free / not bound)');
+    addKV($('details'), 'Status', lic.status);
+
+    // --- verdict ---
+    const v = $('verdict');
+    if (allValid) {
+      v.className = 'status ok';
+      v.innerHTML = '✅ <strong>VALID</strong> — این لایسنس معتبر است';
+      showStatus('ok', '✅ تأیید شد');
+    } else {
+      v.className = 'status err';
+      v.innerHTML = '❌ <strong>INVALID</strong> — این لایسنس معتبر نیست';
+      showStatus('err', '❌ رد شد');
+    }
+
+  } catch (err) {
+    showStatus('err', '❌ خطا در پردازش: ' + (err.message || err.toString()));
+  }
+});
+
+// sanity check on load
+window.addEventListener('load', function() {
+  if (!getSecp()) {
+    showStatus('err', '❌ کتابخانه secp256k1 لود نشد. برای air-gap فایل را local بگذار.');
+  }
+});
+</script>
+</body>
+</html>
