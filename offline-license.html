@@ -56,6 +56,21 @@ window.secpReady = true;
 <h2><span class="badge">۲</span> اطلاعات لایسنس</h2>
 <label>شناسه لایسنس (License ID)</label>
 <input type="text" id="licId" value="HORIZON-GOLD-001">
+<script>
+(function() {
+  try {
+    var el = document.getElementById('licId');
+    if (!el) return;
+    var key = 'horizon_license_counter';
+    var last = parseInt(localStorage.getItem(key) || '0', 10);
+    var next = last + 1;
+    var pad = String(next).padStart(3, '0');
+    el.value = 'HORIZON-GOLD-' + pad;
+    localStorage.setItem(key, String(next));
+    console.log('Auto license ID:', el.value);
+  } catch (e) { console.error('auto_id error:', e); }
+})();
+</script>
 
 <label>سازمان هدف (نمونه)</label>
 <select id="userId">
