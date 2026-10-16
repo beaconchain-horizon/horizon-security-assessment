@@ -348,34 +348,34 @@ document.getElementById('verifySwitchBtn').addEventListener('click', async funct
     return;
   }
   var expDate = new Date(j.expires_at * 1000).toISOString().replace(/\.\d{3}Z$/, 'Z');
-  var data = j.license_id + '|' + j.product_id + '|' + j.user_id + '|' + j.volume + '|' + (j.merkle_root || '') + '|' + j.status + '|' + expDate;
-  var payload = {license_id: j.license_id, user_id: j.user_id, signature: j.signature, data: data};
+  var signedData = JSON.stringify({license_id: j.license_id, user_id: j.user_id, product_id: j.product_id, volume: j.volume, duration: j.duration, merkle_root: j.merkle_root || '', issued_at: j.issued_at, expires_at: j.expires_at, hardware_id: j.hardware_id || ''});
+  var payload = {license_id: j.license_id, user_id: j.user_id, product_id: j.product_id, volume: j.volume, signature: j.signature, signed_data: signedData, public_key: publicKeyHex};
 
   el.className = 'status info';
-  el.textContent = 'Sending to Switch...';
+  el.textContent = 'Sending to Backend...';
 
   try {
-    var r = await fetch('http://localhost:8081/api/v1/license/check', {
+    var r = await fetch('http://localhost:8080/api/v1/license/register', {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify(payload)
     });
     var res = await r.json();
-    if (res.valid && res.verified) {
+    if (r.status === 201 && res.status === 'queued') {
       el.className = 'status ok';
-      el.textContent = 'Switch ACCEPTED - valid=true verified=true';
+      el.textContent = 'ACCEPTED by 7 nodes - queued for block. license_id=' + res.license_id;
     } else {
       el.className = 'status err';
-      el.textContent = 'Switch REJECTED - ' + (res.error || JSON.stringify(res));
+      el.textContent = 'REJECTED - ' + (res.error || JSON.stringify(res));
     }
-  } catch (e) {
+    } catch (e) {
     el.className = 'status err';
     if (window.location.protocol === 'https:' && (e.message.includes('Failed to fetch') || e.message.includes('NetworkError') || e.message.includes('blocked'))) {
       el.className = 'status err';
       el.textContent = 'Mixed content blocked. Browsers cannot call http://localhost from an https:// page. Open this HTML locally: download it and use file:// — or run a local copy via file:///C:/path/to/offline-license.html';
     } else {
       el.className = 'status err';
-      el.textContent = 'Cannot reach Switch on localhost:8081 - ' + e.message + ' — make sure Switch is running.';
+      el.textContent = 'Cannot reach Backend on localhost:8080 - ' + e.message + ' — make sure Backend is running.';
     }
   }
 });
