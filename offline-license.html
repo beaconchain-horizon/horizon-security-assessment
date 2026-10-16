@@ -333,51 +333,48 @@ $('dlBtn').addEventListener('click', function() {
 </div>
 
 <script>
-document.getElementById('verifySwitchBtn').addEventListener('click', async function() {
-  var el = document.getElementById('verifySwitchStatus');
-  var rEl = document.getElementById('result');
-  if (!rEl || !rEl.textContent || rEl.textContent.trim() === '') {
-    el.className = 'status err';
-    el.textContent = 'Generate a license first';
-    return;
-  }
-  var j;
-  try { j = JSON.parse(rEl.textContent); } catch (e) {
-    el.className = 'status err';
-    el.textContent = 'Cannot parse result: ' + e.message;
-    return;
-  }
-  var expDate = new Date(j.expires_at * 1000).toISOString().replace(/\.\d{3}Z$/, 'Z');
-  var signedData = JSON.stringify({license_id: j.license_id, user_id: j.user_id, product_id: j.product_id, volume: j.volume, duration: j.duration, merkle_root: j.merkle_root || '', issued_at: j.issued_at, expires_at: j.expires_at, hardware_id: j.hardware_id || ''});
-  var payload = {license_id: j.license_id, user_id: j.user_id, product_id: j.product_id, volume: j.volume, signature: j.signature, signed_data: signedData, public_key: publicKeyHex};
-
-  el.className = 'status info';
-  el.textContent = 'Sending to Backend...';
-
-  try {
-    var r = await fetch('http://localhost:8080/api/v1/license/register', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify(payload)
-    });
-    var res = await r.json();
-    if (r.status === 201 && res.status === 'queued') {
-      el.className = 'status ok';
-      el.textContent = 'ACCEPTED by 7 nodes - queued for block. license_id=' + res.license_id;
-    } else {
+window.addEventListener('DOMContentLoaded', function() {
+  var btn = document.getElementById('verifySwitchBtn');
+  if (!btn) { console.error('verifySwitchBtn not found'); return; }
+  console.log('verifySwitchBtn listener attached');
+  btn.addEventListener('click', async function() {
+    var el = document.getElementById('verifySwitchStatus');
+    var rEl = document.getElementById('result');
+    if (!rEl || !rEl.textContent || rEl.textContent.trim() === '') {
       el.className = 'status err';
-      el.textContent = 'REJECTED - ' + (res.error || JSON.stringify(res));
+      el.textContent = 'Generate a license first';
+      return;
     }
-    } catch (e) {
-    el.className = 'status err';
-    if (window.location.protocol === 'https:' && (e.message.includes('Failed to fetch') || e.message.includes('NetworkError') || e.message.includes('blocked'))) {
+    var j;
+    try { j = JSON.parse(rEl.textContent); } catch (e) {
       el.className = 'status err';
-      el.textContent = 'Mixed content blocked. Browsers cannot call http://localhost from an https:// page. Open this HTML locally: download it and use file:// — or run a local copy via file:///C:/path/to/offline-license.html';
-    } else {
-      el.className = 'status err';
-      el.textContent = 'Cannot reach Backend on localhost:8080 - ' + e.message + ' — make sure Backend is running.';
+      el.textContent = 'Cannot parse result: ' + e.message;
+      return;
     }
-  }
+    var signedData = JSON.stringify({license_id: j.license_id, user_id: j.user_id, product_id: j.product_id, volume: j.volume, duration: j.duration, merkle_root: j.merkle_root || '', issued_at: j.issued_at, expires_at: j.expires_at, hardware_id: j.hardware_id || ''});
+    var pk = (typeof publicKeyHex !== 'undefined') ? publicKeyHex : '';
+    var payload = {license_id: j.license_id, user_id: j.user_id, product_id: j.product_id, volume: j.volume, signature: j.signature, signed_data: signedData, public_key: pk};
+    el.className = 'status info';
+    el.textContent = 'Sending to Backend...';
+    try {
+      var r = await fetch('http://localhost:8080/api/v1/license/register', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(payload)
+      });
+      var res = await r.json();
+      if (r.status === 201 && res.status === 'queued') {
+        el.className = 'status ok';
+        el.textContent = 'ACCEPTED by 7 nodes - queued for block. license_id=' + res.license_id;
+      } else {
+        el.className = 'status err';
+        el.textContent = 'REJECTED - ' + (res.error || JSON.stringify(res));
+      }
+    } catch (err) {
+      el.className = 'status err';
+      el.textContent = 'Error: ' + err.message;
+    }
+  });
 });
 </script>
 
